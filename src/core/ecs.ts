@@ -96,7 +96,7 @@ export abstract class System {
     this.systemEntities = systemEntities;
   }
 
-  public abstract update(dt: number) {}
+  public abstract update(_dt: number): void
 
   constructor(componentTypes: Array<string>) {
     this.componentTypes = componentTypes;

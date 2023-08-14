@@ -29,12 +29,6 @@ class Controls {
     this.inputDirection.x = (leftVal + rightVal);
     this.inputDirection.y = (upVal + downVal);
 
-    const deadzone = 0.1;
-    if (Math.hypot(this.inputDirection.x, this.inputDirection.y) < deadzone) {
-      this.inputDirection.x = 0;
-      this.inputDirection.y = 0;
-    }
-
     this.isUp = this.inputDirection.y < 0;
     this.isDown = this.inputDirection.y > 0;
     this.isLeft = this.inputDirection.x < 0;

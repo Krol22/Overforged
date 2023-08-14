@@ -16,5 +16,6 @@ const interval = 1000 / 60;
     controls.queryController();
     gameStateMachine.getState().onUpdate(delta);
   }
+
   requestAnimationFrame(draw);
 })(0);
