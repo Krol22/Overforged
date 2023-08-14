@@ -1,53 +1,48 @@
+import { PositionComponent } from '@/components/position.component';
+import { SpriteComponent } from '@/components/sprite.component';
+import { ECS, Entity } from '@/core/ecs';
+import { Renderer } from '@/core/renderer';
 import { State } from '@/core/state';
-import { drawEngine } from '@/core/draw-engine';
-import { controls } from '@/core/controls';
-import { gameStateMachine } from '@/game-state-machine';
-import { menuState } from '@/game-states/menu.state';
+import { DrawSystem } from '@/systems/draw.system';
 
 class GameState implements State {
-  ballImage = new Image();
-  ballSize = 100;
-  ballPosition = new DOMPoint(100, 100);
-  ballVelocity = new DOMPoint(10, 10);
+  private readonly ecs: ECS;
+  private readonly renderer: Renderer;
 
   constructor() {
-    this.ballImage.src = 'ball.png';
+    this.ecs = new ECS();
+
+    const canvas = document.querySelector('.canvas');
+
+    this.renderer = new Renderer(canvas);
   }
 
-  // Make sure ball starts at the same spot when game is entered
   onEnter() {
-    this.ballPosition = new DOMPoint(100, 100);
-    this.ballVelocity = new DOMPoint(10, 10);
+    // Spawn player
+
+    const playerEntity = new Entity();
+
+    const positionComponent = new PositionComponent(0, 0);
+    const spriteComponent = new SpriteComponent(0, 0, 16, 16);
+
+    playerEntity.addComponents([positionComponent, spriteComponent]);
+
+    this.ecs.addEntities([
+      playerEntity,
+    ]);
+
+    const drawSystem = new DrawSystem(this.renderer);
+
+    this.ecs.addSystems([
+      drawSystem,
+    ]);
+
+    this.ecs.start(); 
   }
 
-  onUpdate() {
-    // Update velocity from controller
-    this.ballVelocity.x += controls.inputDirection.x;
-    this.ballVelocity.y += controls.inputDirection.y;
-
-    // Check collisions with edges of map
-    if (this.ballPosition.x + this.ballSize > drawEngine.canvasWidth || this.ballPosition.x <= 0) {
-      this.ballVelocity.x *= -1;
-    }
-
-    if (this.ballPosition.y + this.ballSize > drawEngine.canvasHeight || this.ballPosition.y <= 0) {
-      this.ballVelocity.y *= -1;
-    }
-
-    this.ballPosition.x += this.ballVelocity.x;
-    this.ballPosition.y += this.ballVelocity.y;
-
-    // Apply Drag
-    this.ballVelocity.x *= 0.99;
-    this.ballVelocity.y *= 0.99;
-
-    drawEngine.context.fillStyle = 'blue';
-    drawEngine.context.fillRect(0, 0, drawEngine.canvasWidth, drawEngine.canvasHeight);
-    drawEngine.context.drawImage(this.ballImage, this.ballPosition.x, this.ballPosition.y, this.ballSize, this.ballSize);
-
-    if (controls.isEscape) {
-      gameStateMachine.setState(menuState);
-    }
+  onUpdate(dt: number) {
+    this.ecs.update(dt);
+    this.renderer.clear();
   }
 }
 

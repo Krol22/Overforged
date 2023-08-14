@@ -1,4 +1,4 @@
-class Ecs {
+export class ECS {
   private isRunning = false;
 
   private entities: Entity[] = [];
@@ -41,6 +41,10 @@ class Ecs {
   }
 
   update(dt: number) {
+    if (!this.isRunning) {
+      return;
+    }
+
     for (const system of this.systems) {
       system.update(dt);
     }
@@ -53,7 +57,7 @@ class Ecs {
   }
 }
 
-abstract class Component {
+export abstract class Component {
   public type: string;
 
   constructor(type: string) {
@@ -61,7 +65,7 @@ abstract class Component {
   }
 }
 
-class Entity {
+export class Entity {
   public id: string;
   private components: Record<string, Component> = {};
 
@@ -79,18 +83,22 @@ class Entity {
     return types.every((type) => !!this.components[type]);
   }
 
-  getComponent(type: string) {
-    return this.components[type];
+  getComponent<T>(type: string): T {
+    return this.components[type] as unknown as T;
   }
 }
 
-abstract class System {
+export abstract class System {
   public componentTypes: Array<string> = [];
-  private systemEntities: Array<Entity> = [];
+  protected systemEntities: Array<Entity> = [];
 
   public setSystemEntities(systemEntities: Entity[]) {
     this.systemEntities = systemEntities;
   }
 
   public abstract update(dt: number) {}
+
+  constructor(componentTypes: Array<string>) {
+    this.componentTypes = componentTypes;
+  }
 }
