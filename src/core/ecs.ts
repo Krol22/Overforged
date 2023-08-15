@@ -52,6 +52,7 @@ export abstract class System {
   protected allEntities: Array<Entity> = [];
 
   public markedToRemoveEntities: Array<string> = [];
+  public newEntities: Array<Entity> = [];
 
   public setSystemEntities(systemEntities: Entity[]) {
     this.systemEntities = systemEntities;
@@ -63,6 +64,10 @@ export abstract class System {
 
   public markToRemove(id: string) {
     this.markedToRemoveEntities.push(id);
+  }
+
+  public addEntity(entity: Entity) {
+    this.newEntities.push(entity);
   }
 
   public abstract update(_dt: number): void
@@ -79,6 +84,7 @@ export class ECS {
   private systems: System[] = [];
 
   private entitiesToRemove: Array<string> = [];
+  private entitiesToAdd: Array<Entity> = [];
 
   addEntities(entities: Entity[]) {
     this.entities.push(...entities);
@@ -89,16 +95,16 @@ export class ECS {
   }
 
   removeEntities(ids: Array<string>) {
+    this.entities = this.entities.filter((entity) => !ids.includes(entity.id));
+
     if (this.isRunning) {
-      this.entitiesToRemove = ids;
+      this.updateSystemEntities();
       return;
     }
-
-    this.entities = this.entities.filter((entity) => !ids.includes(entity.id));
   }
 
   addSystems(systems: System[]) {
-    // Systems will be added only on start
+    // Systems will be added only on start no need to check isRunning
     this.systems.push(...systems);
   }
 
@@ -126,17 +132,22 @@ export class ECS {
         ...system.markedToRemoveEntities,
       );
 
+      this.entitiesToAdd.push(
+        ...system.newEntities,
+      );
+
+      system.newEntities = [];
       system.markedToRemoveEntities = [];
     }
 
-    this.entities.forEach((entity) => {
-      Object.values(entity.components).forEach((c) => c.commit());
-    });
+    if (this.entitiesToAdd.length > 0) {
+      this.addEntities(this.entitiesToAdd);
+      this.entitiesToAdd = [];
+    }
 
     if (this.entitiesToRemove.length > 0) {
-      this.entities = this.entities.filter((entity) => !this.entitiesToRemove.includes(entity.id));
+      this.removeEntities(this.entitiesToRemove);
       this.entitiesToRemove = [];
-      this.updateSystemEntities();
     }
   }
 }

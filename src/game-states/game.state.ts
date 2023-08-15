@@ -5,20 +5,21 @@ import { LabelComponent } from '@/components/label.component';
 import { PickableComponent } from '@/components/pickable.component';
 import { PlayerComponent } from '@/components/player.component';
 import { PositionComponent } from '@/components/position.component';
-import { Item } from '@/components/spawner.component';
+import { Item, SpawnerComponent } from '@/components/spawner.component';
 import { SpriteComponent } from '@/components/sprite.component';
 import { ECS, Entity } from '@/core/ecs';
 import { Renderer } from '@/core/renderer';
 import { State } from '@/core/state';
-import { ActionLabelSystem } from '@/systems/actionLabel.system';
 import { ControlsSystem } from '@/systems/controls.system';
 import { DrawSystem } from '@/systems/draw.system';
 import { DropzoneSystem } from '@/systems/dropzone.system';
 import { FurnaceSystem } from '@/systems/furnace.system';
+import { FurnaceDropSystem } from '@/systems/furnaceDrop.system';
 import { HightlightSystem } from '@/systems/hightlight.system';
 import { LabelSystem } from '@/systems/label.system';
 import { OverlapSystem } from '@/systems/overlap.system';
 import { PickupsSystem } from '@/systems/pickups.system';
+import { SpawnSystem } from '@/systems/spawn.system';
 
 const floorLevel = 170;
 
@@ -70,8 +71,15 @@ function spawnCoalpile(): Entity {
   const spriteComponent = new SpriteComponent(0, 0, 16, spriteHeight, '#888');
   const interactionComponent = new InteractionComponent();
   const labelComponent = new LabelComponent('Coal pile');
+  const spawnerComponent = new SpawnerComponent(Item.coal);
 
-  coalpile.addComponents([positionComponent, spriteComponent, interactionComponent, labelComponent]);
+  coalpile.addComponents([
+    positionComponent,
+    spriteComponent,
+    interactionComponent,
+    labelComponent,
+    spawnerComponent,
+  ]);
 
   return coalpile;
 }
@@ -85,8 +93,9 @@ function spawnIronBox(): Entity {
   const spriteComponent = new SpriteComponent(0, 0, 16, spriteHeight, '#888');
   const interactionComponent = new InteractionComponent();
   const labelComponent = new LabelComponent('Iron');
+  const spawnerComponent = new SpawnerComponent(Item.iron);
 
-  ironBox.addComponents([positionComponent, spriteComponent, interactionComponent, labelComponent]);
+  ironBox.addComponents([positionComponent, spriteComponent, interactionComponent, labelComponent, spawnerComponent]);
 
   return ironBox;
 }
@@ -169,19 +178,25 @@ class GameState implements State {
     const highlightSystem = new HightlightSystem();
     const overlapSystem = new OverlapSystem(playerEntity);
     const labelSystem = new LabelSystem(this.renderer);
+    const furnaceSystem = new FurnaceSystem(this.renderer);
     const pickupsSystem = new PickupsSystem(playerEntity, this.renderer);
     const dropzoneSystem = new DropzoneSystem(playerEntity, this.renderer);
-    const furnaceSystem = new FurnaceSystem(playerEntity);
+    const furnaceDropSystem = new FurnaceDropSystem(playerEntity);
+    const spawnSystem = new SpawnSystem(playerEntity);
 
     this.ecs.addSystems([
       controlsSystem,
+
       highlightSystem,
       overlapSystem,
       dropzoneSystem,
       furnaceSystem,
+      furnaceDropSystem,
       pickupsSystem,
       labelSystem,
+
       drawSystem,
+      spawnSystem,
     ]);
 
     this.ecs.start(); 

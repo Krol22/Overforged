@@ -8,6 +8,12 @@ type FontOptions = {
   size?: number;
 }
 
+type RectOptions = {
+  lineWidth?: number;
+  color?: string;
+  fill?: boolean;
+}
+
 export class Renderer {
   context: CanvasRenderingContext2D;
   fontImage: HTMLImageElement;
@@ -26,6 +32,18 @@ export class Renderer {
 
   get canvasHeight() {
     return this.context.canvas.height;
+  }
+
+  drawRect(x: number, y: number, w: number, h: number, options: RectOptions) {
+    this.context.strokeStyle = options.color || "#fff";
+    if (!options.fill) {
+      this.context.lineWidth = options.lineWidth || 2;
+      this.context.strokeRect(x, y, w, h);
+      return;
+    }
+
+    this.context.fillStyle = options.color || "#fff";
+    this.context.fillRect(x, y, w, h);
   }
 
   drawSprite(x: number, y: number, w: number, h: number, color: string) {
@@ -68,6 +86,7 @@ export class Renderer {
   }
 
   clear() {
+    this.context.fillStyle = '#000';
     this.context.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
   }
 }

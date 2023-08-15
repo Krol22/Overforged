@@ -8,6 +8,8 @@ export class PlayerComponent extends Component {
   vy: number = 0;
 
   pickedItem?: string;
+  hadItemPicked: boolean = false;
+  // picketItem can change during the frame in the majority of the systems. This will be extra flag to add some fixes
 
   constructor() {
     super(ComponentTypes.Player);

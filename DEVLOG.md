@@ -40,12 +40,11 @@ Another worrying thing: Building process doesn't work so I don't know how much e
 Day (days?) about furnace:
 
 [x] - Pickup coal from the ground and put it in the furnace,
-[] - Spawn coal from the coalPile,
-
+[x] - Spawn coal from the coalPile,
 [] - Putting it in the furnace,
 [] - Tempareture rising,
 [] - Losing temperature over time,
 
 [] - I'll need temperature reading,
-[] - Add action label underneath,
+[x] - Add action label underneath,
 [] - Remove current labels,

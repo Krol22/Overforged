@@ -5,7 +5,7 @@ import { controls } from '@/core/controls';
 import { System } from '@/core/ecs';
 
 const PLAYER_MAX_SPEED = 2;
-const DAMP = 0.85;
+const DAMP = 0.80;
 
 export class ControlsSystem extends System {
   constructor() {
@@ -21,7 +21,13 @@ export class ControlsSystem extends System {
     const positionComponent = player.getComponent<PositionComponent>(ComponentTypes.Position);
     const playerComponent = player.getComponent<PlayerComponent>(ComponentTypes.Player);
 
-    playerComponent.ax = controls.inputDirection.x * 2;
+    if (playerComponent.pickedItem) {
+      playerComponent.hadItemPicked = true;
+    } else {
+      playerComponent.hadItemPicked = false;
+    }
+
+    playerComponent.ax = controls.inputDirection.x * 1.5;
     playerComponent.vx += playerComponent.ax;
 
     if (playerComponent.vx > PLAYER_MAX_SPEED) {

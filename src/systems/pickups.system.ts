@@ -32,6 +32,7 @@ export class PickupsSystem extends System {
 
       if (!pickableComponent.isPicked) {
         if (interactionComponent.isOverlaping) {
+          // #TODO move to some UI
           const text = `Press <SPACE> to pick ${pickableComponent.item}`;
           const textWidth = text.length * 5;
 
@@ -43,7 +44,11 @@ export class PickupsSystem extends System {
           );
         }
 
-        if (interactionComponent.isOverlaping && controls.isConfirm && !controls.previousState.isConfirm) {
+        if (
+          interactionComponent.isOverlaping
+          && controls.isConfirm && !controls.previousState.isConfirm
+          && !playerPlayerComponent.pickedItem
+        ) {
           pickableComponent.isPicked = true;
           playerPlayerComponent.pickedItem = entity.id;
         }
