@@ -1,11 +1,134 @@
+import { FunnelComponent } from '@/components/funnel.component';
+import { FurnaceComponent } from '@/components/furnace.component';
+import { InteractionComponent } from '@/components/interaction.component';
+import { LabelComponent } from '@/components/label.component';
+import { PickableComponent } from '@/components/pickable.component';
 import { PlayerComponent } from '@/components/player.component';
 import { PositionComponent } from '@/components/position.component';
+import { Item } from '@/components/spawner.component';
 import { SpriteComponent } from '@/components/sprite.component';
 import { ECS, Entity } from '@/core/ecs';
 import { Renderer } from '@/core/renderer';
 import { State } from '@/core/state';
 import { ControlsSystem } from '@/systems/controls.system';
 import { DrawSystem } from '@/systems/draw.system';
+import { FurnaceSystem } from '@/systems/furnace.system';
+import { HightlightSystem } from '@/systems/hightlight.system';
+import { LabelSystem } from '@/systems/label.system';
+import { OverlapSystem } from '@/systems/overlap.system';
+import { PickupsSystem } from '@/systems/pickups.system';
+
+const floorLevel = 170;
+
+function spawnFurnace(): Entity {
+  const furnaceEntity = new Entity();
+
+  const spriteHeight = 32;
+
+  const positionComponent = new PositionComponent(250, floorLevel - spriteHeight);
+  const spriteComponent = new SpriteComponent(0, 0, 32, spriteHeight, '#888');
+  const interactionComponent = new InteractionComponent();
+  const labelComponent = new LabelComponent('Furnace');
+  const funnelComponent = new FunnelComponent([Item.coal, Item.iron]);
+  const furnaceComponent = new FurnaceComponent();
+
+  furnaceEntity.addComponents([
+    positionComponent,
+    spriteComponent,
+    interactionComponent,
+    labelComponent,
+    funnelComponent,
+    furnaceComponent,
+  ]);
+
+  return furnaceEntity;
+}
+
+function spawnAnvil(): Entity {
+  const anvilEntity = new Entity();
+
+  const spriteHeight = 16;
+
+  const positionComponent = new PositionComponent(150, floorLevel - spriteHeight);
+  const spriteComponent = new SpriteComponent(0, 0, 16, spriteHeight, '#888');
+  const interactionComponent = new InteractionComponent();
+  const labelComponent = new LabelComponent('Anvil');
+
+  anvilEntity.addComponents([positionComponent, spriteComponent, interactionComponent, labelComponent]);
+
+  return anvilEntity;
+}
+
+function spawnCoalpile(): Entity {
+  const coalpile = new Entity();
+
+  const spriteHeight = 16;
+
+  const positionComponent = new PositionComponent(310, floorLevel - spriteHeight);
+  const spriteComponent = new SpriteComponent(0, 0, 16, spriteHeight, '#888');
+  const interactionComponent = new InteractionComponent();
+  const labelComponent = new LabelComponent('Coal pile');
+
+  coalpile.addComponents([positionComponent, spriteComponent, interactionComponent, labelComponent]);
+
+  return coalpile;
+}
+
+function spawnIronBox(): Entity {
+  const ironBox = new Entity();
+
+  const spriteHeight = 16;
+
+  const positionComponent = new PositionComponent(205, floorLevel - spriteHeight);
+  const spriteComponent = new SpriteComponent(0, 0, 16, spriteHeight, '#888');
+  const interactionComponent = new InteractionComponent();
+  const labelComponent = new LabelComponent('Iron');
+
+  ironBox.addComponents([positionComponent, spriteComponent, interactionComponent, labelComponent]);
+
+  return ironBox;
+}
+
+function spawnCoal(): Entity {
+  const coal = new Entity();
+
+  const spriteHeight = 4;
+
+  const positionComponent = new PositionComponent(100, floorLevel - spriteHeight);
+  const spriteComponent = new SpriteComponent(0, 0, 8, spriteHeight, '#888');
+  const interactionComponent = new InteractionComponent();
+  const labelComponent = new LabelComponent('Coal');
+  const pickableComponent = new PickableComponent(Item.coal);
+
+  coal.addComponents([
+    positionComponent,
+    spriteComponent,
+    interactionComponent,
+    labelComponent,
+    pickableComponent,
+  ]);
+
+  return coal;
+}
+
+function spawnIron(): Entity {
+  const iron = new Entity();
+  return iron;
+}
+
+function spawnPlayer(): Entity {
+  const playerEntity = new Entity();
+
+  const spriteHeight = 16;
+
+  const positionComponent = new PositionComponent(20, floorLevel - spriteHeight);
+  const spriteComponent = new SpriteComponent(0, 0, 16, spriteHeight, '#fff');
+  const playerComponent = new PlayerComponent();
+
+  playerEntity.addComponents([positionComponent, spriteComponent, playerComponent]);
+
+  return playerEntity;
+}
 
 class GameState implements State {
   private readonly ecs: ECS;
@@ -20,26 +143,41 @@ class GameState implements State {
   }
 
   onEnter() {
-    // Spawn player
-
-    const playerEntity = new Entity();
-
-    const positionComponent = new PositionComponent(0, 150);
-    const spriteComponent = new SpriteComponent(0, 0, 16, 16);
-    const playerComponent = new PlayerComponent();
-
-    playerEntity.addComponents([positionComponent, spriteComponent, playerComponent]);
+    const playerEntity = spawnPlayer();
+    const furnaceEntity = spawnFurnace();
+    const anvilEntity = spawnAnvil();
+    const coalpileEntity = spawnCoalpile();
+    const ironBoxEntity = spawnIronBox();
+    const coalEntity = spawnCoal();
+    const ironEntity = spawnIron();
 
     this.ecs.addEntities([
+      furnaceEntity,
+      anvilEntity,
+      coalpileEntity,
+      ironBoxEntity,
+      coalEntity,
+      ironEntity,
+
       playerEntity,
     ]);
 
     const drawSystem = new DrawSystem(this.renderer);
     const controlsSystem = new ControlsSystem();
+    const highlightSystem = new HightlightSystem();
+    const overlapSystem = new OverlapSystem(playerEntity);
+    const labelSystem = new LabelSystem(this.renderer);
+    const pickupsSystem = new PickupsSystem(playerEntity);
+    const furnaceSystem = new FurnaceSystem(playerEntity);
 
     this.ecs.addSystems([
-      drawSystem,
       controlsSystem,
+      highlightSystem,
+      overlapSystem,
+      furnaceSystem,
+      pickupsSystem,
+      labelSystem,
+      drawSystem,
     ]);
 
     this.ecs.start(); 

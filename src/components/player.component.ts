@@ -7,6 +7,8 @@ export class PlayerComponent extends Component {
   vx: number = 0;
   vy: number = 0;
 
+  pickedItem?: string;
+
   constructor() {
     super(ComponentTypes.Player);
   }

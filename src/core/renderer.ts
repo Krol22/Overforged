@@ -28,12 +28,12 @@ export class Renderer {
     return this.context.canvas.height;
   }
 
-  drawSprite(x: number, y: number, w: number, h: number) {
-    this.context.strokeStyle = '#0ff';
+  drawSprite(x: number, y: number, w: number, h: number, color: string) {
+    this.context.strokeStyle = color;
     this.context.lineWidth = 2;
     this.context.strokeRect(x, y, w, h);
 
-    this.drawText('Hello in the XIII century!', 20, 20, {
+    this.drawText('Hello in the XIII century!', 70, 20, {
       size: 2,
     });
   }

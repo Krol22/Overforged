@@ -29,7 +29,22 @@ Solid first real day of coding work. I wanted to have core foundation like ECS +
 [x] - Setting up first system + components,
 [x] - Setting up renderer,
 [x] - Adding font and test text,
+[x] - Adding aabb & smith entities with labels,
 
 Worrying thing: File with font weights ~800Kb but I've seen bigger immages with lower size so Aseprite might add some unnecessary thing.
 
+Another worrying thing: Building process doesn't work so I don't know how much everything weights,
 
+## Day 3 (stretch to 4?)
+
+Day (days?) about furnace:
+
+[] - Getting coal,
+[] - Putting it in the furnace,
+[] - Tempareture rising,
+[] - Losing temperature over time,
+
+[] - I'll need interactions,
+[] - I'll need temperature reading,
+[] - Add action label underneath,
+[] - Remove labels,

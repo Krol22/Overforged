@@ -17,7 +17,17 @@ export class DrawSystem extends System {
       const positionComponent = entity.getComponent<PositionComponent>(ComponentTypes.Position);
       const spriteComponent = entity.getComponent<SpriteComponent>(ComponentTypes.Sprite);
 
-      this.renderer.drawSprite(positionComponent.x, positionComponent.y, spriteComponent.srcW, spriteComponent.srcH);
+      if (!spriteComponent.visible) {
+        return;
+      }
+
+      this.renderer.drawSprite(
+        positionComponent.x,
+        positionComponent.y,
+        spriteComponent.srcW,
+        spriteComponent.srcH,
+        spriteComponent.color,
+      );
     });
   }
 }
