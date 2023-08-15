@@ -48,7 +48,7 @@ export class FurnaceSystem extends System {
         const spriteComponent = item.getComponent<SpriteComponent>(ComponentTypes.Sprite);
         spriteComponent.visible = false;
 
-        // this.markToRemove(playerPlayerComponent.pickedItem);
+        this.markToRemove(playerPlayerComponent.pickedItem);
       }
     });
   }

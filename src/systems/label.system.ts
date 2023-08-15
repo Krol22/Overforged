@@ -33,8 +33,6 @@ export class LabelSystem extends System {
       const textWidth = labelComponent.text.length * 5;
       const posX = positionComponent.x + (spriteComponent.srcW / 2) - (textWidth / 2) + 2;
 
-      console.log(spriteComponent.visible, labelComponent.text, positionComponent.y - offset_y);
-
       if (!spriteComponent.visible) {
         return;
       }

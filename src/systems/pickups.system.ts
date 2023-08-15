@@ -38,7 +38,7 @@ export class PickupsSystem extends System {
 
       const positionComponent = entity.getComponent<PositionComponent>(ComponentTypes.Position);
 
-      if (controls.isConfirm) {
+      if (controls.isConfirm && !controls.previousState.isConfirm) {
         pickableComponent.isPicked = false;
         positionComponent.y = 170 - 4;
         playerPlayerComponent.pickedItem = undefined;
