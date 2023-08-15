@@ -3,8 +3,13 @@ import { ComponentTypes } from './component.types';
 
 export class InteractionComponent extends Component {
   public isOverlaping: boolean = false;
+  public emptyLabel?: string;
+  public withItemLabel?: string;
 
-  constructor() {
+  constructor(labels: { emptyLabel?: string, withItemLabel?: string } = {}) {
     super(ComponentTypes.Interaction);
+
+    this.emptyLabel = labels.emptyLabel;
+    this.withItemLabel = labels.withItemLabel;
   }
 }

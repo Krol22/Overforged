@@ -10,8 +10,10 @@ import { SpriteComponent } from '@/components/sprite.component';
 import { ECS, Entity } from '@/core/ecs';
 import { Renderer } from '@/core/renderer';
 import { State } from '@/core/state';
+import { ActionLabelSystem } from '@/systems/actionLabel.system';
 import { ControlsSystem } from '@/systems/controls.system';
 import { DrawSystem } from '@/systems/draw.system';
+import { DropzoneSystem } from '@/systems/dropzone.system';
 import { FurnaceSystem } from '@/systems/furnace.system';
 import { HightlightSystem } from '@/systems/hightlight.system';
 import { LabelSystem } from '@/systems/label.system';
@@ -29,7 +31,7 @@ function spawnFurnace(): Entity {
   const spriteComponent = new SpriteComponent(0, 0, 32, spriteHeight, '#888');
   const interactionComponent = new InteractionComponent();
   const labelComponent = new LabelComponent('Furnace');
-  const funnelComponent = new FunnelComponent([Item.coal, Item.iron]);
+  const funnelComponent = new FunnelComponent([Item.coal, Item.iron], 'furnace');
   const furnaceComponent = new FurnaceComponent();
 
   furnaceEntity.addComponents([
@@ -121,7 +123,7 @@ function spawnPlayer(): Entity {
 
   const spriteHeight = 16;
 
-  const positionComponent = new PositionComponent(20, floorLevel - spriteHeight);
+  const positionComponent = new PositionComponent(90, floorLevel - spriteHeight);
   const spriteComponent = new SpriteComponent(0, 0, 16, spriteHeight, '#fff');
   const playerComponent = new PlayerComponent();
 
@@ -167,13 +169,15 @@ class GameState implements State {
     const highlightSystem = new HightlightSystem();
     const overlapSystem = new OverlapSystem(playerEntity);
     const labelSystem = new LabelSystem(this.renderer);
-    const pickupsSystem = new PickupsSystem(playerEntity);
+    const pickupsSystem = new PickupsSystem(playerEntity, this.renderer);
+    const dropzoneSystem = new DropzoneSystem(playerEntity, this.renderer);
     const furnaceSystem = new FurnaceSystem(playerEntity);
 
     this.ecs.addSystems([
       controlsSystem,
       highlightSystem,
       overlapSystem,
+      dropzoneSystem,
       furnaceSystem,
       pickupsSystem,
       labelSystem,
