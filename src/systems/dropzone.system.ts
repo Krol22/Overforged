@@ -24,6 +24,9 @@ export class DropzoneSystem extends System {
     const playerPlayerComponent = this.playerEntity.getComponent<PlayerComponent>(ComponentTypes.Player);
     
     this.systemEntities.map((entity) => {
+      const funnelComponent = entity.getComponent<FunnelComponent>(ComponentTypes.Funnel);
+      funnelComponent.canUseEntityId = undefined;
+
       if (!playerPlayerComponent.pickedItem) {
         return;
       }
@@ -43,8 +46,12 @@ export class DropzoneSystem extends System {
       }
 
       const pickableComponent = item.getComponent<PickableComponent>(ComponentTypes.Pickable);
-      const funnelComponent = entity.getComponent<FunnelComponent>(ComponentTypes.Funnel);
 
+      if (!funnelComponent.itemTypes.includes(pickableComponent.item)) {
+        return;
+      }
+
+      funnelComponent.canUseEntityId = item.id;
       const text = `Press <SPACE> to drop ${pickableComponent.item} in ${funnelComponent.name}`;
       const textWidth = text.length * 5;
 

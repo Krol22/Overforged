@@ -1,4 +1,5 @@
 export enum ComponentTypes {
+  Anvil = 'anvil',
   Position = 'position',
   Sprite = 'sprite',
   Player = 'player',
@@ -8,4 +9,5 @@ export enum ComponentTypes {
   Spawner = 'spawner',
   Funnel = 'funnel',
   Furnace = 'furnace',
+  Steel = 'steel',
 }

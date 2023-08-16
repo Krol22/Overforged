@@ -3,6 +3,7 @@ import { ComponentTypes } from './component.types';
 
 export class InteractionComponent extends Component {
   public isOverlaping: boolean = false;
+  public canInteractWith: boolean = true;
   public emptyLabel?: string;
   public withItemLabel?: string;
 

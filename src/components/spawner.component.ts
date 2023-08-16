@@ -3,7 +3,8 @@ import { ComponentTypes } from './component.types';
 
 export enum Item {
   coal = 'coal',
-  iron = 'iron',
+  steel = 'steel',
+  hotSteel = 'hot-steel',
 }
 
 export class SpawnerComponent extends Component {

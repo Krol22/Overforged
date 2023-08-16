@@ -16,11 +16,11 @@ export class HightlightSystem extends System {
       const spriteComponent = entity.getComponent<SpriteComponent>(ComponentTypes.Sprite);
       const interactionComponent = entity.getComponent<InteractionComponent>(ComponentTypes.Interaction);
 
-      if (interactionComponent.isOverlaping) {
-        spriteComponent.color = '#f00';
-      } else {
-        spriteComponent.color = spriteComponent.defaultColor;
-      }
+      // if (interactionComponent.isOverlaping) {
+        // spriteComponent.color = '#f00';
+      // } else {
+        // spriteComponent.color = spriteComponent.defaultColor;
+      // }
     });
   }
 }

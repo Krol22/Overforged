@@ -1,5 +1,7 @@
 import { ComponentTypes } from '@/components/component.types';
 import { FurnaceComponent } from '@/components/furnace.component';
+import { SpriteComponent } from '@/components/sprite.component';
+import { MaxHeatLevel, SteelComponent } from '@/components/steel.component';
 import { System } from '@/core/ecs';
 import { Renderer } from '@/core/renderer';
 
@@ -21,6 +23,7 @@ export class FurnaceSystem extends System {
     this.systemEntities.map((entity) => {
       const furnaceComponent = entity.getComponent<FurnaceComponent>(ComponentTypes.Furnace);
 
+      // Heating furnace itself
       if (furnaceComponent.fuel > 0 && furnaceComponent.fuelCounter === 0) {
         furnaceComponent.fuel -= 1;
         furnaceComponent.fuelCounter = FuelEfficency;
@@ -43,6 +46,27 @@ export class FurnaceSystem extends System {
         }
       }
 
+      // Heating steel
+      if (furnaceComponent.hasSteelInside) {
+        const steelEntity = this.allEntities.find((e) => e.id === furnaceComponent.steelEntityId);
+
+        if (steelEntity) {
+          const steelComponent = steelEntity.getComponent<SteelComponent>(ComponentTypes.Steel);
+
+          if (!steelComponent.isHeated) {
+            steelComponent.heatCounter += furnaceComponent.temperature;
+
+            if (steelComponent.heatCounter >= MaxHeatLevel) {
+              steelComponent.isHeated = true;
+              furnaceComponent.hasSteelHeated = true;
+            }
+          }
+        } else {
+          console.error('NO STEEL ENTITY');
+        }
+      }
+
+      // Heat level UI
       const progress = 80 * furnaceComponent.temperature / 100;
 
       this.renderer.drawRect(
@@ -53,6 +77,17 @@ export class FurnaceSystem extends System {
         { color: '#f00', fill: true },
       );
       this.renderer.drawRect(this.renderer.canvasWidth - 40, 40, 20, 80, { color: '#fff', lineWidth: 2 });
+
+      const spriteComponent = entity.getComponent<SpriteComponent>(ComponentTypes.Sprite);
+      if (furnaceComponent.hasSteelInside) {
+        spriteComponent.color = '#ccc';
+
+        if (furnaceComponent.hasSteelHeated) {
+          spriteComponent.color = '#cc0';
+        }
+      } else {
+        spriteComponent.color = '#888';
+      }
     });
   }
 }

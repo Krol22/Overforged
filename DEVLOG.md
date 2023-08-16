@@ -35,16 +35,39 @@ Worrying thing: File with font weights ~800Kb but I've seen bigger immages with 
 
 Another worrying thing: Building process doesn't work so I don't know how much everything weights,
 
-## Day 3 (stretch to 4?)
+## Day 3
 
-Day (days?) about furnace:
+Day about furnace:
 
 [x] - Pickup coal from the ground and put it in the furnace,
 [x] - Spawn coal from the coalPile,
-[] - Putting it in the furnace,
-[] - Tempareture rising,
-[] - Losing temperature over time,
+[x] - Putting it in the furnace,
+[x] - Tempareture rising,
+[x] - Losing temperature over time,
 
-[] - I'll need temperature reading,
+[x] - I'll need temperature reading,
 [x] - Add action label underneath,
-[] - Remove current labels,
+[x] - Remove current labels,
+
+Started bit hectic, I've had couple of the problems with the engine and architecture it self, mostly I was struggling with understanding how to build player - objects, objects - objects interactions? But I think I already have a base for that. I was able to finish building the spawner for coal (coalpile), and dropzone for coal (furnace). 
+
+Also Furnace heats up
+
+## Day 4:
+
+It's time to heat up some steel.
+I've also spend some time planning on how the forging system would look like.
+
+[x] - spawing steel from steel box,
+[x] - adding steel to the furnace and waiting for it to be heated,
+    [] - one potential improvement minimal furnace temperature,
+[x] - picking up heated steel from the furnace,
+[x] - puting it down to anvil,
+
+## Day 5:
+
+Forging.
+[] - when there is a hot-steel on anvil I should have additional menu for selecting what needs to be forged.
+[] - spawning forgingItem with whole set of actions that needs to be done.
+    [] - there will be additional acitonsItemComponent,
+[] - I need to readd functionality to put the stuff down (Just need to plan it better - maybe add a button to cycle around items, or priority to interaction component? Yeah blocking interaction component would be nice :thinking: Blocking + tabing?),
