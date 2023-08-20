@@ -1,4 +1,5 @@
 import { AnvilComponent } from '@/components/anvil.component';
+import { DeskComponent } from '@/components/desk.component';
 import { FunnelComponent } from '@/components/funnel.component';
 import { FurnaceComponent } from '@/components/furnace.component';
 import { InteractionComponent } from '@/components/interaction.component';
@@ -14,6 +15,7 @@ import { Renderer } from '@/core/renderer';
 import { State } from '@/core/state';
 import { AnvilSystem } from '@/systems/anvil.system';
 import { ControlsSystem } from '@/systems/controls.system';
+import { DeskSystem } from '@/systems/desk.system';
 import { DrawSystem } from '@/systems/draw.system';
 import { DropzoneSystem } from '@/systems/dropzone.system';
 import { FurnaceSystem } from '@/systems/furnace.system';
@@ -40,12 +42,14 @@ function spawnDesk(): Entity {
     Item.sword,
     Item.axe,
   ], 'desk');
+  const deskComponent = new DeskComponent();
 
   deskEntity.addComponents([
     positionComponent,
     spriteComponent,
     interactionComponent,
     funnelComponent,
+    deskComponent,
   ]);
 
   return deskEntity;
@@ -240,6 +244,7 @@ class GameState implements State {
     const spawnSystem = new SpawnSystem(playerEntity, this.renderer);
     const anvilSystem = new AnvilSystem(playerEntity, this.renderer);
     const sharpenerSystem = new SharpenerSystem(playerEntity, this.renderer);
+    const deskSystem = new DeskSystem(playerEntity);
 
     this.ecs.addSystems([
       controlsSystem,
@@ -250,6 +255,7 @@ class GameState implements State {
       sharpenerSystem,
       furnaceDropSystem,
       anvilSystem,
+      deskSystem,
       pickupsSystem,
       dropzoneSystem,
 

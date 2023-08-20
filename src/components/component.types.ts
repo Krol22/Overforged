@@ -1,5 +1,6 @@
 export enum ComponentTypes {
   Anvil = 'anvil',
+  Desk = 'desk',
   Position = 'position',
   Sprite = 'sprite',
   Player = 'player',
