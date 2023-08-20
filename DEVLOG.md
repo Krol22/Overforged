@@ -66,8 +66,11 @@ I've also spend some time planning on how the forging system would look like.
 
 ## Day 5:
 
+Great day of work. I think the transformerComponent is really great and it simplified the process of working with forging. I've planned 4 items for now but with this system it should be eaisly extendable. Also I think 3 mini mechanics of the game will be really fun! Next is implementing sharpener and desk (but its should be kind eassy) and all mechanics will be ready!
+
 Forging.
-[] - when there is a hot-steel on anvil I should have additional menu for selecting what needs to be forged.
-[] - spawning forgingItem with whole set of actions that needs to be done.
-    [] - there will be additional acitonsItemComponent,
+[x] - when there is a hot-steel on anvil I should have additional menu for selecting what needs to be forged.
+[x] - spawning forgingItem with whole set of actions that needs to be done.
 [] - I need to readd functionality to put the stuff down (Just need to plan it better - maybe add a button to cycle around items, or priority to interaction component? Yeah blocking interaction component would be nice :thinking: Blocking + tabing?),
+
+

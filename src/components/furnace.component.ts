@@ -11,9 +11,9 @@ export class FurnaceComponent extends Component {
   // This will count dont to decreas fuel amount
   public fuelCounter: number = 0;
 
-  public hasSteelInside: boolean = false;
-  public steelEntityId?: string = undefined;
-  public hasSteelHeated: boolean = false;
+  public hasItemInside: boolean = false;
+  public heatingEntityId?: string = undefined;
+  public entityHeated: boolean = false;
 
   constructor() {
     super(ComponentTypes.Furnace);

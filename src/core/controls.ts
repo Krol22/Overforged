@@ -5,10 +5,23 @@ class Controls {
   isRight = false;
   isConfirm = false;
   isEscape = false;
+  is1 = false;
+  is2 = false;
+  is3 = false;
+  is4 = false;
   inputDirection: DOMPoint;
 
   keyMap: Map<string, boolean> = new Map();
-  previousState = { isUp: this.isUp, isDown: this.isDown, isConfirm: this.isConfirm, isEscape: this.isEscape };
+  previousState = {
+    isUp: this.isUp,
+    isDown: this.isDown,
+    is1: this.is1,
+    is2: this.is2,
+    is3: this.is3,
+    is4: this.is4,
+    isConfirm: this.isConfirm,
+    isEscape: this.isEscape
+  };
 
   constructor() {
     document.addEventListener('keydown', event => this.toggleKey(event, true));
@@ -33,8 +46,13 @@ class Controls {
     this.isDown = this.inputDirection.y > 0;
     this.isLeft = this.inputDirection.x < 0;
     this.isRight = this.inputDirection.x > 0;
-    this.isConfirm = Boolean(this.keyMap.get('Enter'));
+    this.isConfirm = Boolean(this.keyMap.get('Space'));
     this.isEscape = Boolean(this.keyMap.get('Escape'));
+
+    this.is1 = Boolean(this.keyMap.get('Digit1'));
+    this.is2 = Boolean(this.keyMap.get('Digit2'));
+    this.is3 = Boolean(this.keyMap.get('Digit3'));
+    this.is4 = Boolean(this.keyMap.get('Digit4'));
   }
 
   private toggleKey(event: KeyboardEvent, isPressed: boolean) {

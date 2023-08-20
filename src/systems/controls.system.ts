@@ -1,4 +1,5 @@
 import { ComponentTypes } from '@/components/component.types';
+import { PickableComponent } from '@/components/pickable.component';
 import { PlayerComponent } from '@/components/player.component';
 import { PositionComponent } from '@/components/position.component';
 import { controls } from '@/core/controls';
@@ -22,11 +23,25 @@ export class ControlsSystem extends System {
     const playerComponent = player.getComponent<PlayerComponent>(ComponentTypes.Player);
 
     if (playerComponent.pickedItem) {
+      const item = this.allEntities.find(({ id }) => {
+        return id === playerComponent.pickedItem;
+      });
+
+      if (item) {
+        const pickableComponent = item.getComponent<PickableComponent>(ComponentTypes.Pickable);
+        // console.log("Picked Item: ", pickableComponent.item);
+      }
       playerComponent.hadItemPicked = true;
     } else {
       playerComponent.hadItemPicked = false;
     }
 
+    if (!playerComponent.hasMoveLocked) {
+      this.movePlayer(positionComponent, playerComponent);
+    }
+  }
+
+  private movePlayer(positionComponent: PositionComponent, playerComponent: PlayerComponent) {
     playerComponent.ax = controls.inputDirection.x * 1.5;
     playerComponent.vx += playerComponent.ax;
 

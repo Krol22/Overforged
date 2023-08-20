@@ -5,8 +5,10 @@ import { InteractionComponent } from '@/components/interaction.component';
 import { LabelComponent } from '@/components/label.component';
 import { PlayerComponent } from '@/components/player.component';
 import { PositionComponent } from '@/components/position.component';
+import { SharpenerComponent } from '@/components/sharpener.component';
 import { Item, SpawnerComponent } from '@/components/spawner.component';
 import { SpriteComponent } from '@/components/sprite.component';
+import { anvilTransformerDefinition, furnaceTransformerDefinition, sharpenerTransformerDefinition, TransformerComponent } from '@/components/transformer.component';
 import { ECS, Entity } from '@/core/ecs';
 import { Renderer } from '@/core/renderer';
 import { State } from '@/core/state';
@@ -19,21 +21,82 @@ import { FurnaceDropSystem } from '@/systems/furnaceDrop.system';
 import { HightlightSystem } from '@/systems/hightlight.system';
 import { OverlapSystem } from '@/systems/overlap.system';
 import { PickupsSystem } from '@/systems/pickups.system';
+import { SharpenerSystem } from '@/systems/sharpener.system';
 import { SpawnSystem } from '@/systems/spawn.system';
 
 const floorLevel = 170;
 
+function spawnDesk(): Entity {
+  const deskEntity = new Entity();
+
+  const spriteHeight = 24; 
+
+  const positionComponent = new PositionComponent(50, floorLevel - spriteHeight);
+  const spriteComponent = new SpriteComponent(0, 0, 8, spriteHeight, '#888');
+  const interactionComponent = new InteractionComponent();
+  const funnelComponent = new FunnelComponent([
+    Item.dagger,
+    Item.horseShoe,
+    Item.sword,
+    Item.axe,
+  ], 'desk');
+
+  deskEntity.addComponents([
+    positionComponent,
+    spriteComponent,
+    interactionComponent,
+    funnelComponent,
+  ]);
+
+  return deskEntity;
+}
+
+function spawnSharpener(): Entity {
+  const sharpenerEntity = new Entity();
+
+  const spriteHeight = 16;
+
+  const positionComponent = new PositionComponent(90, floorLevel - spriteHeight);
+  const spriteComponent = new SpriteComponent(0, 0, 8, spriteHeight, '#888');
+  const interactionComponent = new InteractionComponent();
+  const transformerComponent = new TransformerComponent(sharpenerTransformerDefinition);
+  const funnelComponent = new FunnelComponent([
+    Item.dagger1,
+    Item.sword4,
+    Item.axe2,
+  ], 'sharpener');
+  const sharpenerComponent = new SharpenerComponent();
+
+  sharpenerEntity.addComponents([
+    positionComponent,
+    spriteComponent,
+    interactionComponent,
+    transformerComponent,
+    funnelComponent,
+    sharpenerComponent,
+  ]);
+
+  return sharpenerEntity;
+}
+
 function spawnFurnace(): Entity {
   const furnaceEntity = new Entity();
 
-  const spriteHeight = 32;
+  const spriteHeight = 48;
 
   const positionComponent = new PositionComponent(250, floorLevel - spriteHeight);
   const spriteComponent = new SpriteComponent(0, 0, 32, spriteHeight, '#888');
   const interactionComponent = new InteractionComponent();
   const labelComponent = new LabelComponent('Furnace');
-  const funnelComponent = new FunnelComponent([Item.coal, Item.steel], 'furnace');
+
+  const funnelComponent = new FunnelComponent([
+    Item.coal,
+    Item.steel,
+    Item.sword1,
+  ], 'furnace');
+
   const furnaceComponent = new FurnaceComponent();
+  const transformerComponent = new TransformerComponent(furnaceTransformerDefinition);
 
   furnaceEntity.addComponents([
     positionComponent,
@@ -42,6 +105,7 @@ function spawnFurnace(): Entity {
     labelComponent,
     funnelComponent,
     furnaceComponent,
+    transformerComponent,
   ]);
 
   return furnaceEntity;
@@ -56,8 +120,16 @@ function spawnAnvil(): Entity {
   const spriteComponent = new SpriteComponent(0, 0, 16, spriteHeight, '#888');
   const interactionComponent = new InteractionComponent();
   const labelComponent = new LabelComponent('Anvil');
-  const funnelComponent = new FunnelComponent([Item.hotSteel], 'Anvil');
+
+  const funnelComponent = new FunnelComponent([
+    Item.hotSteel,
+    Item.sword2,
+    Item.sword3,
+    Item.axe1,
+  ], 'Anvil');
+
   const anvilComponent = new AnvilComponent();
+  const transformerComponent = new TransformerComponent(anvilTransformerDefinition);
 
   anvilEntity.addComponents([
     positionComponent,
@@ -66,6 +138,7 @@ function spawnAnvil(): Entity {
     labelComponent,
     funnelComponent,
     anvilComponent,
+    transformerComponent,
   ]);
 
   return anvilEntity;
@@ -141,12 +214,17 @@ class GameState implements State {
     const anvilEntity = spawnAnvil();
     const coalpileEntity = spawnCoalpile();
     const ironBoxEntity = spawnIronBox();
+    const sharpenerEntity = spawnSharpener();
+    const deskEntity = spawnDesk();
 
     this.ecs.addEntities([
       furnaceEntity,
       anvilEntity,
       coalpileEntity,
       ironBoxEntity,
+
+      sharpenerEntity,
+      deskEntity,
 
       playerEntity,
     ]);
@@ -161,17 +239,19 @@ class GameState implements State {
     const furnaceDropSystem = new FurnaceDropSystem(playerEntity);
     const spawnSystem = new SpawnSystem(playerEntity, this.renderer);
     const anvilSystem = new AnvilSystem(playerEntity, this.renderer);
+    const sharpenerSystem = new SharpenerSystem(playerEntity, this.renderer);
 
     this.ecs.addSystems([
       controlsSystem,
 
       highlightSystem,
       overlapSystem,
-      dropzoneSystem,
       furnaceSystem,
+      sharpenerSystem,
       furnaceDropSystem,
       anvilSystem,
       pickupsSystem,
+      dropzoneSystem,
 
       drawSystem,
       spawnSystem,

@@ -4,10 +4,10 @@ import { FurnaceComponent } from '@/components/furnace.component';
 import { InteractionComponent } from '@/components/interaction.component';
 import { PickableComponent } from '@/components/pickable.component';
 import { PlayerComponent } from '@/components/player.component';
-import { PositionComponent } from '@/components/position.component';
 import { Item } from '@/components/spawner.component';
 import { SpriteComponent } from '@/components/sprite.component';
 import { SteelComponent } from '@/components/steel.component';
+import { TransformerComponent } from '@/components/transformer.component';
 import { controls } from '@/core/controls';
 import { Entity, System } from '@/core/ecs';
 
@@ -20,6 +20,7 @@ export class FurnaceDropSystem extends System {
       ComponentTypes.Funnel,
       ComponentTypes.Furnace,
       ComponentTypes.Interaction,
+      ComponentTypes.Transformer,
     ]);
 
     this.playerEntity = playerEntity;
@@ -36,77 +37,78 @@ export class FurnaceDropSystem extends System {
       if (!interactionComponent.isOverlaping) {
         return;
       }
+      
+      if (playerPlayerComponent.pickedItem && controls.isConfirm && !controls.previousState.isConfirm) {
+        const playerItem = this.getEntity(playerPlayerComponent.pickedItem);
+        const pickableComponent = playerItem.getComponent<PickableComponent>(ComponentTypes.Pickable);
 
-      // leave item in the furnace
+        if (pickableComponent.item === Item.coal) {
+          this.addCoalToFurnace(entity, playerItem);
+          playerPlayerComponent.pickedItem = undefined;
+          return;
+        }
+      }
+
+      // pickup item from furnace
+      if (
+        !playerPlayerComponent.pickedItem &&
+        controls.isConfirm && !controls.previousState.isConfirm &&
+        furnaceComponent.entityHeated
+      ) {
+        furnaceComponent.entityHeated = false;
+        furnaceComponent.hasItemInside = false;
+
+        playerPlayerComponent.pickedItem = furnaceComponent.heatingEntityId;
+        const steel = this.getEntity(furnaceComponent.heatingEntityId);
+
+        const transformerComponent = entity.getComponent<TransformerComponent>(ComponentTypes.Transformer);
+        const spriteComponent = steel.getComponent<SpriteComponent>(ComponentTypes.Sprite);
+        const steelPickableComponent = steel.getComponent<PickableComponent>(ComponentTypes.Pickable);
+
+        spriteComponent.visible = true;
+        const transformsItemTo = transformerComponent.definition[steelPickableComponent.item];
+
+        funnelComponent.isLocked = false;
+
+        if (!transformsItemTo) {
+          return;
+        }
+
+        steelPickableComponent.item = transformsItemTo;
+      }
+
       if (
         funnelComponent.canUseEntityId &&
         controls.isConfirm && !controls.previousState.isConfirm
       ) {
-        const item = this.allEntities.find(
-          (e) => e.id === funnelComponent.canUseEntityId
-        );
-
-        if (!item) {
-          return;
-        }
-
-        const pickableComponent = item.getComponent<PickableComponent>(ComponentTypes.Pickable);
-
-        if (!funnelComponent.itemTypes.includes(pickableComponent.item)) {
-          return;
-        }
-
-        const spriteComponent = item.getComponent<SpriteComponent>(ComponentTypes.Sprite);
+        const playerItem = this.getEntity(playerPlayerComponent.pickedItem);
+        const spriteComponent = playerItem.getComponent<SpriteComponent>(ComponentTypes.Sprite);
         spriteComponent.visible = false;
         playerPlayerComponent.pickedItem = undefined;
-        this.interactItemWithFurnace(entity, item);
-      }
 
-      // pickup steel from furnace
-      if (
-        !playerPlayerComponent.pickedItem &&
-        controls.isConfirm && !controls.previousState.isConfirm &&
-        furnaceComponent.hasSteelHeated
-      ) {
-        furnaceComponent.hasSteelHeated = false;
-        furnaceComponent.hasSteelInside = false;
-
-        playerPlayerComponent.pickedItem = furnaceComponent.steelEntityId;
-
-        const item = this.allEntities.find(
-          (e) => e.id === furnaceComponent.steelEntityId
-        );
-
-        if (!item) {
-          return;
-        }
-
-        const spriteComponent = item.getComponent<SpriteComponent>(ComponentTypes.Sprite);
-        const pickableComponent = item.getComponent<PickableComponent>(ComponentTypes.Pickable);
-        spriteComponent.visible = true;
-        pickableComponent.item = Item.hotSteel;
+        this.interactItemWithFurnace(entity, playerItem);
+        funnelComponent.isLocked = true;
       }
     });
   }
 
-  private interactItemWithFurnace(furnace: Entity, item: Entity) {
-    const pickableComponent = item.getComponent<PickableComponent>(ComponentTypes.Pickable);
-    const itemInteractionComponent = item.getComponent<InteractionComponent>(ComponentTypes.Interaction);
+  private addCoalToFurnace(furnace: Entity, coal: Entity) {
     const furnaceComponent = furnace.getComponent<FurnaceComponent>(ComponentTypes.Furnace);
+    furnaceComponent.fuel = furnaceComponent.fuel + 1;
+    this.markToRemove(coal.id);
+  }
 
-    switch (pickableComponent.item) {
-      case (Item.coal):
-        furnaceComponent.fuel = furnaceComponent.fuel + 1;
-        this.markToRemove(item.id);
-        break;
-      case (Item.steel):
-        const steelComponent = item.getComponent<SteelComponent>(ComponentTypes.Steel);
-        itemInteractionComponent.canInteractWith = false;
-        steelComponent.inFurnace = true;
+  private interactItemWithFurnace(furnace: Entity, item: Entity) {
+    const furnaceComponent = furnace.getComponent<FurnaceComponent>(ComponentTypes.Furnace);
+    const itemInteractionComponent = item.getComponent<InteractionComponent>(ComponentTypes.Interaction);
 
-        furnaceComponent.hasSteelInside = true;
-        furnaceComponent.steelEntityId = item.id;
-        break;
-    }
+    const steelComponent = item.getComponent<SteelComponent>(ComponentTypes.Steel);
+    itemInteractionComponent.canInteractWith = false;
+    steelComponent.heatCounter = 0;
+    steelComponent.isHeated = false;
+    steelComponent.inFurnace = true;
+
+    furnaceComponent.hasItemInside = true;
+    furnaceComponent.heatingEntityId = item.id;
   }
 }

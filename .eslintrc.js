@@ -29,7 +29,7 @@ module.exports = {
     'no-unused-vars': 'off',
     'no-bitwise': 'off',
     'no-plusplus': 'off',
-    'class-methods-use-this': 'warn',
+    'class-methods-use-this': 'off',
     'linebreak-style': 0,
     'function-paren-newline': 'off',
     'unused-imports/no-unused-imports': 'warn',

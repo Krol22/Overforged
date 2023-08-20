@@ -10,4 +10,6 @@ export enum ComponentTypes {
   Funnel = 'funnel',
   Furnace = 'furnace',
   Steel = 'steel',
+  Transformer = 'transformer',
+  Sharpener = 'sharpener',
 }

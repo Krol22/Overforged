@@ -14,6 +14,7 @@ export class FurnaceSystem extends System {
   constructor(renderer: Renderer) {
     super([
       ComponentTypes.Furnace,
+      ComponentTypes.Transformer,
     ]);
 
     this.renderer = renderer;
@@ -47,8 +48,8 @@ export class FurnaceSystem extends System {
       }
 
       // Heating steel
-      if (furnaceComponent.hasSteelInside) {
-        const steelEntity = this.allEntities.find((e) => e.id === furnaceComponent.steelEntityId);
+      if (furnaceComponent.hasItemInside) {
+        const steelEntity = this.allEntities.find((e) => e.id === furnaceComponent.heatingEntityId);
 
         if (steelEntity) {
           const steelComponent = steelEntity.getComponent<SteelComponent>(ComponentTypes.Steel);
@@ -58,7 +59,7 @@ export class FurnaceSystem extends System {
 
             if (steelComponent.heatCounter >= MaxHeatLevel) {
               steelComponent.isHeated = true;
-              furnaceComponent.hasSteelHeated = true;
+              furnaceComponent.entityHeated = true;
             }
           }
         } else {
@@ -79,10 +80,10 @@ export class FurnaceSystem extends System {
       this.renderer.drawRect(this.renderer.canvasWidth - 40, 40, 20, 80, { color: '#fff', lineWidth: 2 });
 
       const spriteComponent = entity.getComponent<SpriteComponent>(ComponentTypes.Sprite);
-      if (furnaceComponent.hasSteelInside) {
+      if (furnaceComponent.hasItemInside) {
         spriteComponent.color = '#ccc';
 
-        if (furnaceComponent.hasSteelHeated) {
+        if (furnaceComponent.entityHeated) {
           spriteComponent.color = '#cc0';
         }
       } else {

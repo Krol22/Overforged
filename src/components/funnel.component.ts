@@ -7,6 +7,7 @@ export class FunnelComponent extends Component {
   public name: string = '';
 
   public canUseEntityId?: string = undefined;
+  public isLocked = false;
 
   constructor(itemTypes: Array<Item>, name: string) {
     super(ComponentTypes.Funnel);

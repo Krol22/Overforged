@@ -27,7 +27,7 @@ export class OverlapSystem extends System {
       const spriteComponent = entity.getComponent<SpriteComponent>(ComponentTypes.Sprite);
       const interactionComponent = entity.getComponent<InteractionComponent>(ComponentTypes.Interaction);
 
-      interactionComponent.isOverlaping = aabb(
+      interactionComponent.isOverlaping = interactionComponent.canInteractWith && aabb(
         playerPositionComponent.x,
         playerPositionComponent.y,
         playerSpriteComponent.srcW,

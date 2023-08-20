@@ -66,6 +66,20 @@ export abstract class System {
     this.markedToRemoveEntities.push(id);
   }
 
+  public getEntity(id?: string) {
+    if (!id) {
+      throw new Error(`ID IS UNDEFINED`);
+    }
+
+    const entity = this.allEntities.find((e) => e.id === id);
+
+    if (!entity) {
+      throw new Error(`Entity ${id} not found`);
+    }
+
+    return entity;
+  }
+
   public addEntity(entity: Entity) {
     this.newEntities.push(entity);
   }
