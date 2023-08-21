@@ -11,7 +11,14 @@ export class FurnaceComponent extends Component {
   // This will count dont to decreas fuel amount
   public fuelCounter: number = 0;
 
+  /**
+   * @deprecated The method should not be used
+   */
   public hasItemInside: boolean = false;
+
+  /**
+   * @deprecated The method should not be used
+   */
   public heatingEntityId?: string = undefined;
   public entityHeated: boolean = false;
 

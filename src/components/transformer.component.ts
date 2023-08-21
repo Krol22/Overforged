@@ -3,21 +3,20 @@ import { ComponentTypes } from './component.types';
 import { Item } from './spawner.component';
 
 export const anvilTransformerDefinition = {
-  [Item.sword2]: Item.sword3,
-  [Item.sword3]: Item.sword4,
+  [Item.weapon2]: Item.weapon3,
+  [Item.weapon3]: Item.weapon4,
 
-  [Item.axe1]: Item.axe2,
+  [Item.tool1]: Item.tool2,
 };
 
 export const furnaceTransformerDefinition = {
   [Item.steel]: Item.hotSteel,
-  [Item.sword1]: Item.sword2,
+  [Item.weapon1]: Item.weapon2,
 };
 
 export const sharpenerTransformerDefinition = {
-  [Item.dagger1]: Item.dagger,
-  [Item.sword4]: Item.sword,
-  [Item.axe2]: Item.axe,
+  [Item.weapon4]: Item.weapon,
+  [Item.tool2]: Item.tool,
 };
 
 export class TransformerComponent extends Component {

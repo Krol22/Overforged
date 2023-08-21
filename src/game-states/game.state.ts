@@ -3,7 +3,9 @@ import { DeskComponent } from '@/components/desk.component';
 import { FunnelComponent } from '@/components/funnel.component';
 import { FurnaceComponent } from '@/components/furnace.component';
 import { InteractionComponent } from '@/components/interaction.component';
+import { ItemHolderComponent } from '@/components/itemHolder.component';
 import { LabelComponent } from '@/components/label.component';
+import { PhysicsComponent } from '@/components/physics.component';
 import { PlayerComponent } from '@/components/player.component';
 import { PositionComponent } from '@/components/position.component';
 import { SharpenerComponent } from '@/components/sharpener.component';
@@ -13,6 +15,7 @@ import { anvilTransformerDefinition, furnaceTransformerDefinition, sharpenerTran
 import { ECS, Entity } from '@/core/ecs';
 import { Renderer } from '@/core/renderer';
 import { State } from '@/core/state';
+import { UI } from '@/core/ui';
 import { AnvilSystem } from '@/systems/anvil.system';
 import { ControlsSystem } from '@/systems/controls.system';
 import { DeskSystem } from '@/systems/desk.system';
@@ -37,12 +40,12 @@ function spawnDesk(): Entity {
   const spriteComponent = new SpriteComponent(0, 0, 8, spriteHeight, '#888');
   const interactionComponent = new InteractionComponent();
   const funnelComponent = new FunnelComponent([
-    Item.dagger,
     Item.horseShoe,
-    Item.sword,
-    Item.axe,
+    Item.weapon,
+    Item.tool,
   ], 'desk');
   const deskComponent = new DeskComponent();
+  const itemHolderComponent = new ItemHolderComponent();
 
   deskEntity.addComponents([
     positionComponent,
@@ -50,6 +53,7 @@ function spawnDesk(): Entity {
     interactionComponent,
     funnelComponent,
     deskComponent,
+    itemHolderComponent,
   ]);
 
   return deskEntity;
@@ -65,9 +69,8 @@ function spawnSharpener(): Entity {
   const interactionComponent = new InteractionComponent();
   const transformerComponent = new TransformerComponent(sharpenerTransformerDefinition);
   const funnelComponent = new FunnelComponent([
-    Item.dagger1,
-    Item.sword4,
-    Item.axe2,
+    Item.weapon4,
+    Item.tool2,
   ], 'sharpener');
   const sharpenerComponent = new SharpenerComponent();
 
@@ -92,11 +95,12 @@ function spawnFurnace(): Entity {
   const spriteComponent = new SpriteComponent(0, 0, 32, spriteHeight, '#888');
   const interactionComponent = new InteractionComponent();
   const labelComponent = new LabelComponent('Furnace');
+  const itemHolderComponent = new ItemHolderComponent();
 
   const funnelComponent = new FunnelComponent([
     Item.coal,
     Item.steel,
-    Item.sword1,
+    Item.weapon1,
   ], 'furnace');
 
   const furnaceComponent = new FurnaceComponent();
@@ -110,6 +114,7 @@ function spawnFurnace(): Entity {
     funnelComponent,
     furnaceComponent,
     transformerComponent,
+    itemHolderComponent,
   ]);
 
   return furnaceEntity;
@@ -124,12 +129,13 @@ function spawnAnvil(): Entity {
   const spriteComponent = new SpriteComponent(0, 0, 16, spriteHeight, '#888');
   const interactionComponent = new InteractionComponent();
   const labelComponent = new LabelComponent('Anvil');
+  const itemHolderComponent = new ItemHolderComponent();
 
   const funnelComponent = new FunnelComponent([
     Item.hotSteel,
-    Item.sword2,
-    Item.sword3,
-    Item.axe1,
+    Item.weapon2,
+    Item.weapon3,
+    Item.tool1,
   ], 'Anvil');
 
   const anvilComponent = new AnvilComponent();
@@ -143,6 +149,7 @@ function spawnAnvil(): Entity {
     funnelComponent,
     anvilComponent,
     transformerComponent,
+    itemHolderComponent,
   ]);
 
   return anvilEntity;
@@ -194,8 +201,9 @@ function spawnPlayer(): Entity {
   const positionComponent = new PositionComponent(90, floorLevel - spriteHeight);
   const spriteComponent = new SpriteComponent(0, 0, 16, spriteHeight, '#fff');
   const playerComponent = new PlayerComponent();
+  const physicsComponent = new PhysicsComponent();
 
-  playerEntity.addComponents([positionComponent, spriteComponent, playerComponent]);
+  playerEntity.addComponents([positionComponent, spriteComponent, playerComponent, physicsComponent]);
 
   return playerEntity;
 }
@@ -203,6 +211,7 @@ function spawnPlayer(): Entity {
 class GameState implements State {
   private readonly ecs: ECS;
   private readonly renderer: Renderer;
+  private readonly ui: UI;
 
   constructor() {
     this.ecs = new ECS();
@@ -210,6 +219,7 @@ class GameState implements State {
     const canvas = document.querySelector('#canvas');
 
     this.renderer = new Renderer(canvas);
+    this.ui = new UI(this.renderer);
   }
 
   onEnter() {
@@ -238,17 +248,18 @@ class GameState implements State {
     const highlightSystem = new HightlightSystem();
     const overlapSystem = new OverlapSystem(playerEntity);
     const furnaceSystem = new FurnaceSystem(this.renderer);
-    const pickupsSystem = new PickupsSystem(playerEntity, this.renderer);
-    const dropzoneSystem = new DropzoneSystem(playerEntity, this.renderer);
-    const furnaceDropSystem = new FurnaceDropSystem(playerEntity);
-    const spawnSystem = new SpawnSystem(playerEntity, this.renderer);
-    const anvilSystem = new AnvilSystem(playerEntity, this.renderer);
-    const sharpenerSystem = new SharpenerSystem(playerEntity, this.renderer);
+    const pickupsSystem = new PickupsSystem(playerEntity, this.ui);
+    const dropzoneSystem = new DropzoneSystem(playerEntity, this.ui);
+    const furnaceDropSystem = new FurnaceDropSystem(playerEntity, this.ui);
+    const spawnSystem = new SpawnSystem(playerEntity, this.ui);
+    const anvilSystem = new AnvilSystem(this.renderer, this.ui);
+    const sharpenerSystem = new SharpenerSystem(playerEntity, this.renderer, this.ui);
     const deskSystem = new DeskSystem(playerEntity);
 
     this.ecs.addSystems([
       controlsSystem,
 
+      dropzoneSystem,
       highlightSystem,
       overlapSystem,
       furnaceSystem,
@@ -257,7 +268,6 @@ class GameState implements State {
       anvilSystem,
       deskSystem,
       pickupsSystem,
-      dropzoneSystem,
 
       drawSystem,
       spawnSystem,
@@ -268,8 +278,10 @@ class GameState implements State {
 
   onUpdate(dt: number) {
     this.renderer.clear();
+    this.ui.clear();
 
     this.ecs.update(dt);
+    this.ui.draw();
   }
 }
 

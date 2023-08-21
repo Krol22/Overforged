@@ -11,6 +11,7 @@ export class DeskSystem extends System {
   constructor(playerEntity: Entity) {
     super([
       ComponentTypes.Desk,
+      ComponentTypes.ItemHolder,
       ComponentTypes.Funnel,
     ]);
 
@@ -23,16 +24,16 @@ export class DeskSystem extends System {
     this.systemEntities.forEach((entity) => {
       const funnelComponent = entity.getComponent<FunnelComponent>(ComponentTypes.Funnel);
 
-      if (funnelComponent.canUseEntityId) {
-        if (controls.isConfirm && !controls.previousState.isConfirm) {
-          const item = this.getEntity(funnelComponent.canUseEntityId);
+      // if (funnelComponent.canUseEntityId) {
+        // if (controls.isConfirm && !controls.previousState.isConfirm) {
+          // const item = this.getEntity(funnelComponent.canUseEntityId);
 
-          const spriteComponent = item.getComponent<SpriteComponent>(ComponentTypes.Sprite);
-          playerPlayerComponent.pickedItem = undefined;
-          spriteComponent.visible = false;
-          this.markToRemove(item.id);
-        }
-      }
+          // const spriteComponent = item.getComponent<SpriteComponent>(ComponentTypes.Sprite);
+          // playerPlayerComponent.pickedItem = undefined;
+          // spriteComponent.visible = false;
+          // this.markToRemove(item.id);
+        // }
+      // }
     });
   }
 }

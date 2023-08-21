@@ -8,18 +8,15 @@ export enum Item {
 
   horseShoe = 'horse-shoe',
 
-  dagger1 = 'dagger1', // from hot-steel to anvil
-  dagger = 'dagger', // from anvil to sharpener
+  weapon1 = 'weapon1', // from hot-steel to anvil
+  weapon2 = 'weapon2', // from anvil to furnace,
+  weapon3 = 'weapon3', // from furnace to anvil
+  weapon4 = 'weapon4', // from anvil to anvil,
+  weapon = 'weapon', // from anvil to sharpener
 
-  sword1 = 'sword1', // from hot-steel to anvil
-  sword2 = 'sword2', // from anvil to furnace,
-  sword3 = 'sword3', // from furnace to anvil
-  sword4 = 'sword4', // from anvil to anvil,
-  sword = 'sword', // from anvil to sharpener
-
-  axe1 = 'axe1', // from hot-sceel to anvil
-  axe2 = 'axe2', // from anvil to anvil
-  axe = 'axe', // from anvil to sharpener
+  tool1 = 'tool1', // from hot-sceel to anvil
+  tool2 = 'tool2', // from anvil to anvil
+  tool = 'tool', // from anvil to sharpener
 }
 
 export class SpawnerComponent extends Component {

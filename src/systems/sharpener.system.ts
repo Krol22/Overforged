@@ -1,5 +1,6 @@
 import { ComponentTypes } from '@/components/component.types';
 import { FunnelComponent } from '@/components/funnel.component';
+import { InteractionComponent } from '@/components/interaction.component';
 import { PickableComponent } from '@/components/pickable.component';
 import { PlayerComponent } from '@/components/player.component';
 import { MaxSharpingTime, SharpenerComponent } from '@/components/sharpener.component';
@@ -7,12 +8,14 @@ import { TransformerComponent } from '@/components/transformer.component';
 import { controls } from '@/core/controls';
 import { Entity, System } from '@/core/ecs';
 import { Renderer } from '@/core/renderer';
+import { UI } from '@/core/ui';
 
 export class SharpenerSystem extends System {
   public playerEntity: Entity;
   public renderer: Renderer;
+  public ui: UI;
 
-  constructor(playerEntity: Entity, renderer: Renderer) {
+  constructor(playerEntity: Entity, renderer: Renderer, ui: UI) {
     super([
       ComponentTypes.Funnel,
       ComponentTypes.Interaction,
@@ -22,6 +25,7 @@ export class SharpenerSystem extends System {
 
     this.playerEntity = playerEntity;
     this.renderer = renderer;
+    this.ui = ui;
   }
 
   public update(_dt: number): void {
@@ -31,21 +35,36 @@ export class SharpenerSystem extends System {
       const funnelComponent = entity.getComponent<FunnelComponent>(ComponentTypes.Funnel);
       const sharpenerComponent = entity.getComponent<SharpenerComponent>(ComponentTypes.Sharpener);
       const transformerComponent = entity.getComponent<TransformerComponent>(ComponentTypes.Transformer);
+      const interactionComponent = entity.getComponent<InteractionComponent>(ComponentTypes.Interaction);
 
-      if (funnelComponent.canUseEntityId) {
-        if (controls.isConfirm) {
-          playerPlayerComponent.hasMoveLocked = true;
-          const hasSharpenItem = this.sharpenItem(sharpenerComponent);
-          if (!hasSharpenItem) {
-            return; 
-          }
+      if (!playerPlayerComponent.pickedItem) {
+        return;
+      }
 
-          const item = this.getEntity(funnelComponent.canUseEntityId);
-          this.transformItemAfterSharping(item, transformerComponent);
-          playerPlayerComponent.hasMoveLocked = false;
-        } else {
-          playerPlayerComponent.hasMoveLocked = false;
+      const pickedItem = this.getEntity(playerPlayerComponent.pickedItem);
+      const pickableComponent = pickedItem.getComponent<PickableComponent>(ComponentTypes.Pickable);
+
+      if (!funnelComponent.isValidItem(pickableComponent.item)) {
+        return; 
+      }
+
+      if (!interactionComponent.isOverlaping) {
+        return;
+      }
+
+      if (controls.isConfirm) {
+        playerPlayerComponent.hasMoveLocked = true;
+        const hasSharpenItem = this.sharpenItem(sharpenerComponent);
+        if (!hasSharpenItem) {
+          return; 
         }
+
+        const item = this.getEntity(pickedItem.id);
+        this.transformItemAfterSharping(item, transformerComponent);
+        playerPlayerComponent.hasMoveLocked = false;
+      } else {
+        this.ui.setActionText('Press <SPACE> to sharpen item');
+        playerPlayerComponent.hasMoveLocked = false;
       }
     });
   }
@@ -75,5 +94,6 @@ export class SharpenerSystem extends System {
   private transformItemAfterSharping(item: Entity, transformerComponent: TransformerComponent) {
     const pickableComponent = item.getComponent<PickableComponent>(ComponentTypes.Pickable);
     pickableComponent.item = transformerComponent.transform(pickableComponent.item);
+    pickableComponent.disposable = true;
   }
 }

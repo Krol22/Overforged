@@ -5,13 +5,13 @@ import { PlayerComponent } from '@/components/player.component';
 import { PositionComponent } from '@/components/position.component';
 import { controls } from '@/core/controls';
 import { Entity, System } from '@/core/ecs';
-import { Renderer } from '@/core/renderer';
+import { UI } from '@/core/ui';
 
 export class PickupsSystem extends System {
   public playerEntity: Entity;
-  public renderer: Renderer;
+  public ui: UI;
 
-  constructor(playerEntity: Entity, renderer: Renderer) {
+  constructor(playerEntity: Entity, ui: UI) {
     super([
       ComponentTypes.Interaction,
       ComponentTypes.Position,
@@ -19,7 +19,7 @@ export class PickupsSystem extends System {
     ]);
 
     this.playerEntity = playerEntity;
-    this.renderer = renderer;
+    this.ui = ui;
   }
 
   public update(_dt: number): void {
@@ -32,23 +32,24 @@ export class PickupsSystem extends System {
 
       if (!pickableComponent.isPicked) {
         if (interactionComponent.isOverlaping) {
-          // #TODO move to some UI
-          const text = `Press <SPACE> to pick ${pickableComponent.item}`;
-          const textWidth = text.length * 5;
-
-          this.renderer.drawText(
-            text,
-            Math.floor(this.renderer.canvasWidth / 2 - textWidth / 2),
-            this.renderer.canvasHeight - 10,
-            { size: 1 },
-          );
+          this.ui.setActionText(`Press <SPACE> to pick ${pickableComponent.item}`);
         }
 
         if (
           interactionComponent.isOverlaping
           && controls.isConfirm && !controls.previousState.isConfirm
-          && !playerPlayerComponent.pickedItem
         ) {
+
+          // If player has picketItem drop it
+          if (playerPlayerComponent.pickedItem) {
+            const item = this.getEntity(playerPlayerComponent.pickedItem);
+            const itemPickableComponent = item.getComponent<PickableComponent>(ComponentTypes.Pickable);
+            const itemPositionComponent = item.getComponent<PositionComponent>(ComponentTypes.Position);
+
+            itemPickableComponent.isPicked = false;
+            itemPositionComponent.y = 170 - 4;
+          }
+
           pickableComponent.isPicked = true;
           playerPlayerComponent.pickedItem = entity.id;
         }
@@ -57,13 +58,14 @@ export class PickupsSystem extends System {
       }
 
       const positionComponent = entity.getComponent<PositionComponent>(ComponentTypes.Position);
+      console.log('PICKED ITEM: ', pickableComponent.item);
 
-      // if (controls.isConfirm && !controls.previousState.isConfirm) {
-        // pickableComponent.isPicked = false;
-        // positionComponent.y = 170 - 4;
-        // playerPlayerComponent.pickedItem = undefined;
-        // return;
-      // }
+      if (controls.isX && !controls.previousState.isX) {
+        pickableComponent.isPicked = false;
+        positionComponent.y = 170 - 4;
+        playerPlayerComponent.pickedItem = undefined;
+        return;
+      }
 
       positionComponent.x = playerPositionComponent.x;
       positionComponent.y = 170 - 16 - 24;

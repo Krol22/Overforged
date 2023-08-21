@@ -73,4 +73,31 @@ Forging.
 [x] - spawning forgingItem with whole set of actions that needs to be done.
 [] - I need to readd functionality to put the stuff down (Just need to plan it better - maybe add a button to cycle around items, or priority to interaction component? Yeah blocking interaction component would be nice :thinking: Blocking + tabing?),
 
+## Day 6-7:
 
+Didnt do much on the 6th day I've only started on adding last 2 entities: Sharpener + desk. But I've got good idea with simplifying the forging process. Instead of particular items there will be 3 categories:
+
+- horse-shoe,
+- tool,
+- weapon,
+
+On the 7th day I actually had some time :D And I've finished the main gameloop. 
+
+[x] - add sharpener,
+[x] - add desk,
+
+It's still not perfect and has a lot of bugs but II see the light in the tunnel. Next things that I need to do are:
+- swapping steel with a heated weapon in the forge (and the other way),
+- dropping items system - this is a bit a safe exit, just to be sure that there won't be a possibility where player is locked.
+- simlifying the transformes.
+
+## Day 8:
+
+Fck me, yesterday I had majority of mechanics done so today I rewrote 50% of it as my interactions were bit shitty. Main problem was with implementing swapping items functionality. Fortunately majority is working there are still 2 bug:
+
+[] - swapping steel - hot-steel in furnace doesn't work.
+[x] - after forging tool I need to pick it up and forge again.
+
+but other than that:
+[x] - dropping items system is back, not perfect but good enough. I'll implement a way so dropped item won't overlap with forge entities,
+[x] - ui component,

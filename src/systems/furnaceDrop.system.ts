@@ -2,28 +2,32 @@ import { ComponentTypes } from '@/components/component.types';
 import { FunnelComponent } from '@/components/funnel.component';
 import { FurnaceComponent } from '@/components/furnace.component';
 import { InteractionComponent } from '@/components/interaction.component';
+import { ItemHolderComponent } from '@/components/itemHolder.component';
 import { PickableComponent } from '@/components/pickable.component';
 import { PlayerComponent } from '@/components/player.component';
 import { Item } from '@/components/spawner.component';
-import { SpriteComponent } from '@/components/sprite.component';
 import { SteelComponent } from '@/components/steel.component';
 import { TransformerComponent } from '@/components/transformer.component';
 import { controls } from '@/core/controls';
 import { Entity, System } from '@/core/ecs';
+import { UI } from '@/core/ui';
 
 // #TODO update name
 export class FurnaceDropSystem extends System {
   public playerEntity: Entity;
+  public ui: UI;
 
-  constructor(playerEntity: Entity) {
+  constructor(playerEntity: Entity, ui: UI) {
     super([
       ComponentTypes.Funnel,
       ComponentTypes.Furnace,
       ComponentTypes.Interaction,
       ComponentTypes.Transformer,
+      ComponentTypes.ItemHolder,
     ]);
 
     this.playerEntity = playerEntity;
+    this.ui = ui;
   } 
 
   public update(_dt: number): void {
@@ -31,15 +35,19 @@ export class FurnaceDropSystem extends System {
 
     this.systemEntities.map((entity) => {
       const interactionComponent = entity.getComponent<InteractionComponent>(ComponentTypes.Interaction);
+      const itemHolderComponent = entity.getComponent<ItemHolderComponent>(ComponentTypes.ItemHolder);
       const funnelComponent = entity.getComponent<FunnelComponent>(ComponentTypes.Funnel);
       const furnaceComponent = entity.getComponent<FurnaceComponent>(ComponentTypes.Furnace);
+      const transformerComponent = entity.getComponent<TransformerComponent>(ComponentTypes.Transformer);
 
       if (!interactionComponent.isOverlaping) {
         return;
       }
       
-      if (playerPlayerComponent.pickedItem && controls.isConfirm && !controls.previousState.isConfirm) {
-        const playerItem = this.getEntity(playerPlayerComponent.pickedItem);
+      // handle coals
+      if (controls.isConfirm && !controls.previousState.isConfirm && playerPlayerComponent.pickedItem) {
+        const id = itemHolderComponent.pickedEntityId || playerPlayerComponent.pickedItem;
+        const playerItem = this.getEntity(id);
         const pickableComponent = playerItem.getComponent<PickableComponent>(ComponentTypes.Pickable);
 
         if (pickableComponent.item === Item.coal) {
@@ -49,45 +57,29 @@ export class FurnaceDropSystem extends System {
         }
       }
 
-      // pickup item from furnace
-      if (
-        !playerPlayerComponent.pickedItem &&
-        controls.isConfirm && !controls.previousState.isConfirm &&
-        furnaceComponent.entityHeated
-      ) {
-        furnaceComponent.entityHeated = false;
-        furnaceComponent.hasItemInside = false;
-
-        playerPlayerComponent.pickedItem = furnaceComponent.heatingEntityId;
-        const steel = this.getEntity(furnaceComponent.heatingEntityId);
-
-        const transformerComponent = entity.getComponent<TransformerComponent>(ComponentTypes.Transformer);
-        const spriteComponent = steel.getComponent<SpriteComponent>(ComponentTypes.Sprite);
-        const steelPickableComponent = steel.getComponent<PickableComponent>(ComponentTypes.Pickable);
-
-        spriteComponent.visible = true;
-        const transformsItemTo = transformerComponent.definition[steelPickableComponent.item];
-
-        funnelComponent.isLocked = false;
-
-        if (!transformsItemTo) {
-          return;
-        }
-
-        steelPickableComponent.item = transformsItemTo;
+      if (!(controls.isConfirm && !controls.previousState.isConfirm)) {
+        return;
+      }
+      // furnace picked item from player
+      if (itemHolderComponent.pickedEntityId) {
+        const pickedItem = this.getEntity(itemHolderComponent.pickedEntityId);
+        this.interactItemWithFurnace(pickedItem);
+        funnelComponent.isLocked = true;
       }
 
-      if (
-        funnelComponent.canUseEntityId &&
-        controls.isConfirm && !controls.previousState.isConfirm
-      ) {
-        const playerItem = this.getEntity(playerPlayerComponent.pickedItem);
-        const spriteComponent = playerItem.getComponent<SpriteComponent>(ComponentTypes.Sprite);
-        spriteComponent.visible = false;
-        playerPlayerComponent.pickedItem = undefined;
+      // furnace dropped item for player
+      if (itemHolderComponent.droppedEntityId) {
+        const droppedItem = this.getEntity(itemHolderComponent.droppedEntityId);
+        furnaceComponent.entityHeated = false;
 
-        this.interactItemWithFurnace(entity, playerItem);
-        funnelComponent.isLocked = true;
+        const pickableComponent = droppedItem.getComponent<PickableComponent>(ComponentTypes.Pickable);
+        const transformsItemTo = transformerComponent.definition[pickableComponent.item];
+
+        if (!transformsItemTo) {
+          throw new Error('INVALID TRANSFORMER DEFINITION');
+        }
+
+        pickableComponent.item = transformsItemTo;
       }
     });
   }
@@ -98,8 +90,7 @@ export class FurnaceDropSystem extends System {
     this.markToRemove(coal.id);
   }
 
-  private interactItemWithFurnace(furnace: Entity, item: Entity) {
-    const furnaceComponent = furnace.getComponent<FurnaceComponent>(ComponentTypes.Furnace);
+  private interactItemWithFurnace(item: Entity) {
     const itemInteractionComponent = item.getComponent<InteractionComponent>(ComponentTypes.Interaction);
 
     const steelComponent = item.getComponent<SteelComponent>(ComponentTypes.Steel);
@@ -107,8 +98,5 @@ export class FurnaceDropSystem extends System {
     steelComponent.heatCounter = 0;
     steelComponent.isHeated = false;
     steelComponent.inFurnace = true;
-
-    furnaceComponent.hasItemInside = true;
-    furnaceComponent.heatingEntityId = item.id;
   }
 }

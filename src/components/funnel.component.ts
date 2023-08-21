@@ -15,4 +15,8 @@ export class FunnelComponent extends Component {
     this.itemTypes = itemTypes;
     this.name = name;
   }
+
+  isValidItem(item: Item) {
+    return this.itemTypes.includes(item);
+  }
 }

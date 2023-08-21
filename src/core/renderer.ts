@@ -1,8 +1,8 @@
 import font from '../assets/font.png';
 import { characters } from './font';
 
-const letterWidth = 5;
-const letterHeight = 6;
+export const LETTER_WIDTH = 5;
+export const LETTER_HEIGHT = 6;
 
 type FontOptions = {
   size?: number;
@@ -68,15 +68,15 @@ export class Renderer {
 
       const fontSize = options.size || 1;
 
-      const transformedWidth = letterWidth * fontSize;
-      const transformedHeight = letterHeight * fontSize;
+      const transformedWidth = LETTER_WIDTH * fontSize;
+      const transformedHeight = LETTER_HEIGHT * fontSize;
 
       this.context.drawImage(
         this.fontImage,
-        letterX * letterWidth,
-        letterY * letterHeight,
-        letterWidth,
-        letterHeight,
+        letterX * LETTER_WIDTH,
+        letterY * LETTER_HEIGHT,
+        LETTER_WIDTH,
+        LETTER_HEIGHT,
         x + i * transformedWidth,
         y,
         transformedWidth,

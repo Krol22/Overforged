@@ -1,4 +1,5 @@
 import { ComponentTypes } from '@/components/component.types';
+import { PhysicsComponent } from '@/components/physics.component';
 import { PickableComponent } from '@/components/pickable.component';
 import { PlayerComponent } from '@/components/player.component';
 import { PositionComponent } from '@/components/position.component';
@@ -13,6 +14,7 @@ export class ControlsSystem extends System {
     super([
       ComponentTypes.Position,
       ComponentTypes.Player,
+      ComponentTypes.Physics,
     ]);
   }
 
@@ -20,6 +22,7 @@ export class ControlsSystem extends System {
     const player = this.systemEntities[0];
 
     const positionComponent = player.getComponent<PositionComponent>(ComponentTypes.Position);
+    const physicsComponent = player.getComponent<PhysicsComponent>(ComponentTypes.Physics);
     const playerComponent = player.getComponent<PlayerComponent>(ComponentTypes.Player);
 
     if (playerComponent.pickedItem) {
@@ -37,26 +40,26 @@ export class ControlsSystem extends System {
     }
 
     if (!playerComponent.hasMoveLocked) {
-      this.movePlayer(positionComponent, playerComponent);
+      this.movePlayer(positionComponent, physicsComponent);
     }
   }
 
-  private movePlayer(positionComponent: PositionComponent, playerComponent: PlayerComponent) {
-    playerComponent.ax = controls.inputDirection.x * 1.5;
-    playerComponent.vx += playerComponent.ax;
+  private movePlayer(positionComponent: PositionComponent, physicsComponent: PhysicsComponent) {
+    physicsComponent.ax = controls.inputDirection.x * 1.5;
+    physicsComponent.vx += physicsComponent.ax;
 
-    if (playerComponent.vx > PLAYER_MAX_SPEED) {
-      playerComponent.vx = PLAYER_MAX_SPEED;
+    if (physicsComponent.vx > PLAYER_MAX_SPEED) {
+      physicsComponent.vx = PLAYER_MAX_SPEED;
     }
 
-    if (playerComponent.vx < -PLAYER_MAX_SPEED) {
-      playerComponent.vx = -PLAYER_MAX_SPEED;
+    if (physicsComponent.vx < -PLAYER_MAX_SPEED) {
+      physicsComponent.vx = -PLAYER_MAX_SPEED;
     }
 
-    positionComponent.x += playerComponent.vx;
+    positionComponent.x += physicsComponent.vx;
 
-    if (playerComponent.vx !== 0) {
-      playerComponent.vx *= DAMP;
+    if (physicsComponent.vx !== 0) {
+      physicsComponent.vx *= DAMP;
     }
   }
 }

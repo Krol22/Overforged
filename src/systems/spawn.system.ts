@@ -9,7 +9,7 @@ import { SpriteComponent } from '@/components/sprite.component';
 import { SteelComponent } from '@/components/steel.component';
 import { controls } from '@/core/controls';
 import { Entity, System } from '@/core/ecs';
-import { Renderer } from '@/core/renderer';
+import { UI } from '@/core/ui';
 
 function spawnCoal(): Entity {
   const coal = new Entity();
@@ -20,7 +20,7 @@ function spawnCoal(): Entity {
   const spriteComponent = new SpriteComponent(0, 0, 8, spriteHeight, '#888');
   const interactionComponent = new InteractionComponent();
   const labelComponent = new LabelComponent('Coal');
-  const pickableComponent = new PickableComponent(Item.coal);
+  const pickableComponent = new PickableComponent(Item.coal, true);
 
   pickableComponent.isPicked = true;
 
@@ -62,9 +62,9 @@ function spawnSteel(): Entity {
 
 export class SpawnSystem extends System {
   private playerEntity: Entity;
-  private renderer: Renderer;
+  private ui: UI;
 
-  constructor(playerEntity: Entity, renderer: Renderer) {
+  constructor(playerEntity: Entity, ui: UI) {
     super([
       ComponentTypes.Interaction,
       ComponentTypes.Spawner,
@@ -72,7 +72,7 @@ export class SpawnSystem extends System {
     ]);
 
     this.playerEntity = playerEntity;
-    this.renderer = renderer;
+    this.ui = ui;
   }
 
   public update(_dt: number): void {
@@ -92,15 +92,7 @@ export class SpawnSystem extends System {
 
       const spawner = entity.getComponent<SpawnerComponent>(ComponentTypes.Spawner);
 
-      const text = `Press <SPACE> to pick up the ${spawner.itemType}`;
-      const textWidth = text.length * 5;
-
-      this.renderer.drawText(
-        text,
-        Math.floor(this.renderer.canvasWidth / 2 - textWidth / 2),
-        this.renderer.canvasHeight - 10,
-        { size: 1 },
-      );
+      this.ui.setActionText(`Press <SPACE> to pick up the ${spawner.itemType}`);
 
       if (controls.isConfirm && !controls.previousState.isConfirm) {
         switch (spawner.itemType) {

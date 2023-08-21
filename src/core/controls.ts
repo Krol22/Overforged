@@ -8,7 +8,7 @@ class Controls {
   is1 = false;
   is2 = false;
   is3 = false;
-  is4 = false;
+  isX = false;
   inputDirection: DOMPoint;
 
   keyMap: Map<string, boolean> = new Map();
@@ -18,7 +18,7 @@ class Controls {
     is1: this.is1,
     is2: this.is2,
     is3: this.is3,
-    is4: this.is4,
+    isX: this.isX,
     isConfirm: this.isConfirm,
     isEscape: this.isEscape
   };
@@ -52,7 +52,8 @@ class Controls {
     this.is1 = Boolean(this.keyMap.get('Digit1'));
     this.is2 = Boolean(this.keyMap.get('Digit2'));
     this.is3 = Boolean(this.keyMap.get('Digit3'));
-    this.is4 = Boolean(this.keyMap.get('Digit4'));
+
+    this.isX = Boolean(this.keyMap.get('KeyX'));
   }
 
   private toggleKey(event: KeyboardEvent, isPressed: boolean) {
