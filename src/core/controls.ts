@@ -1,6 +1,4 @@
 class Controls {
-  isUp = false;
-  isDown = false;
   isLeft = false;
   isRight = false;
   isConfirm = false;
@@ -13,8 +11,6 @@ class Controls {
 
   keyMap: Map<string, boolean> = new Map();
   previousState = {
-    isUp: this.isUp,
-    isDown: this.isDown,
     is1: this.is1,
     is2: this.is2,
     is3: this.is3,
@@ -30,8 +26,6 @@ class Controls {
   }
 
   queryController() {
-    this.previousState.isUp = this.isUp;
-    this.previousState.isDown = this.isDown;
     this.previousState.isConfirm = this.isConfirm;
     this.previousState.isEscape = this.isEscape;
 
@@ -42,8 +36,6 @@ class Controls {
     this.inputDirection.x = (leftVal + rightVal);
     this.inputDirection.y = (upVal + downVal);
 
-    this.isUp = this.inputDirection.y < 0;
-    this.isDown = this.inputDirection.y > 0;
     this.isLeft = this.inputDirection.x < 0;
     this.isRight = this.inputDirection.x > 0;
     this.isConfirm = Boolean(this.keyMap.get('Space'));

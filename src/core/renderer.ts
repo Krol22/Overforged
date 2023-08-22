@@ -15,8 +15,8 @@ type RectOptions = {
 }
 
 export class Renderer {
-  context: CanvasRenderingContext2D;
-  fontImage: HTMLImageElement;
+  private context: CanvasRenderingContext2D;
+  private fontImage: HTMLImageElement;
 
   constructor(canvas: any) {
     this.context = canvas.getContext('2d');
@@ -50,10 +50,6 @@ export class Renderer {
     this.context.strokeStyle = color;
     this.context.lineWidth = 2;
     this.context.strokeRect(x, y, w, h);
-
-    this.drawText('Hello in the XIII century!', 70, 20, {
-      size: 2,
-    });
   }
 
   drawText(text: string, x: number, y: number, options: FontOptions) {

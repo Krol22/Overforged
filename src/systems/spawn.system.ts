@@ -1,6 +1,5 @@
 import { ComponentTypes } from '@/components/component.types';
 import { InteractionComponent } from '@/components/interaction.component';
-import { LabelComponent } from '@/components/label.component';
 import { PickableComponent } from '@/components/pickable.component';
 import { PlayerComponent } from '@/components/player.component';
 import { PositionComponent } from '@/components/position.component';
@@ -19,7 +18,6 @@ function spawnCoal(): Entity {
   const positionComponent = new PositionComponent(Math.random() * 50, 170 - spriteHeight);
   const spriteComponent = new SpriteComponent(0, 0, 8, spriteHeight, '#888');
   const interactionComponent = new InteractionComponent();
-  const labelComponent = new LabelComponent('Coal');
   const pickableComponent = new PickableComponent(Item.coal, true);
 
   pickableComponent.isPicked = true;
@@ -28,7 +26,6 @@ function spawnCoal(): Entity {
     positionComponent,
     spriteComponent,
     interactionComponent,
-    labelComponent,
     pickableComponent,
   ]);
 
@@ -42,7 +39,6 @@ function spawnSteel(): Entity {
   const positionComponent = new PositionComponent(Math.random() * 50, 170 - spriteHeight);
   const spriteComponent = new SpriteComponent(0, 0, 2, spriteHeight, '#ddd');
   const interactionComponent = new InteractionComponent();
-  const labelComponent = new LabelComponent('Steel');
   const pickableComponent = new PickableComponent(Item.steel);
   const steelComponent = new SteelComponent();
 
@@ -52,7 +48,6 @@ function spawnSteel(): Entity {
     positionComponent,
     spriteComponent,
     interactionComponent,
-    labelComponent,
     pickableComponent,
     steelComponent,
   ]);

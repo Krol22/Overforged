@@ -2,30 +2,18 @@
 import { generateRandomId } from '@/utils/generateId';
 
 export abstract class Component {
-  public type: string;
+  public type: number;
 
   public changes: Array<Object> = [];
 
-  constructor(type: string) {
+  constructor(type: number) {
     this.type = type;
-  }
-
-  update(change: Object) {
-    this.changes.push(change);
-  }
-
-  commit() {
-    Object.entries(this.changes).forEach(([key, value]) => {
-      this[key as keyof typeof value] = value as any;
-    });
-
-    this.changes = [];
   }
 }
 
 export class Entity {
   public id: string;
-  public components: Record<string, Component> = {};
+  public components: Record<number, Component> = {};
 
   constructor() {
     this.id = generateRandomId();
@@ -37,17 +25,17 @@ export class Entity {
     });
   }
 
-  hasEvery(types: Array<string>) {
+  hasEvery(types: Array<number>) {
     return types.every((type) => !!this.components[type]);
   }
 
-  getComponent<T>(type: string): T {
+  getComponent<T>(type: number): T {
     return this.components[type] as unknown as T;
   }
 }
 
 export abstract class System {
-  public componentTypes: Array<string> = [];
+  public componentTypes: Array<number> = [];
   protected systemEntities: Array<Entity> = [];
   protected allEntities: Array<Entity> = [];
 
@@ -86,7 +74,7 @@ export abstract class System {
 
   public abstract update(_dt: number): void
 
-  constructor(componentTypes: Array<string>) {
+  constructor(componentTypes: Array<number>) {
     this.componentTypes = componentTypes;
   }
 }

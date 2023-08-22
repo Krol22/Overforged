@@ -33,11 +33,16 @@ export default defineConfig(({ command, mode }) => {
     config.base = '';
     // @ts-ignore
     config.build = {
-      minify: false,
+      minify: 'terser',
       target: 'es2020',
       modulePreload: { polyfill: false },
       assetsInlineLimit: 800,
       assetsDir: '',
+      terserOptions: {
+        module: true,
+        toplevel: true,
+        safari10: true,
+      },
       rollupOptions: {
         output: {
           inlineDynamicImports: true,
@@ -47,7 +52,7 @@ export default defineConfig(({ command, mode }) => {
       }
     };
     // @ts-ignore
-    config.plugins = [typescriptPlugin(), closurePlugin(), roadrollerPlugin(), ectPlugin()];
+    config.plugins = [typescriptPlugin()]//, closurePlugin()];// , roadrollerPlugin(), ectPlugin()];
   }
 
   return config;

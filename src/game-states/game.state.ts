@@ -4,7 +4,6 @@ import { FunnelComponent } from '@/components/funnel.component';
 import { FurnaceComponent } from '@/components/furnace.component';
 import { InteractionComponent } from '@/components/interaction.component';
 import { ItemHolderComponent } from '@/components/itemHolder.component';
-import { LabelComponent } from '@/components/label.component';
 import { PhysicsComponent } from '@/components/physics.component';
 import { PlayerComponent } from '@/components/player.component';
 import { PositionComponent } from '@/components/position.component';
@@ -23,7 +22,6 @@ import { DrawSystem } from '@/systems/draw.system';
 import { DropzoneSystem } from '@/systems/dropzone.system';
 import { FurnaceSystem } from '@/systems/furnace.system';
 import { FurnaceDropSystem } from '@/systems/furnaceDrop.system';
-import { HightlightSystem } from '@/systems/hightlight.system';
 import { OverlapSystem } from '@/systems/overlap.system';
 import { PickupsSystem } from '@/systems/pickups.system';
 import { SharpenerSystem } from '@/systems/sharpener.system';
@@ -94,7 +92,6 @@ function spawnFurnace(): Entity {
   const positionComponent = new PositionComponent(250, floorLevel - spriteHeight);
   const spriteComponent = new SpriteComponent(0, 0, 32, spriteHeight, '#888');
   const interactionComponent = new InteractionComponent();
-  const labelComponent = new LabelComponent('Furnace');
   const itemHolderComponent = new ItemHolderComponent();
 
   const funnelComponent = new FunnelComponent([
@@ -110,7 +107,6 @@ function spawnFurnace(): Entity {
     positionComponent,
     spriteComponent,
     interactionComponent,
-    labelComponent,
     funnelComponent,
     furnaceComponent,
     transformerComponent,
@@ -128,7 +124,6 @@ function spawnAnvil(): Entity {
   const positionComponent = new PositionComponent(150, floorLevel - spriteHeight);
   const spriteComponent = new SpriteComponent(0, 0, 16, spriteHeight, '#888');
   const interactionComponent = new InteractionComponent();
-  const labelComponent = new LabelComponent('Anvil');
   const itemHolderComponent = new ItemHolderComponent();
 
   const funnelComponent = new FunnelComponent([
@@ -145,7 +140,6 @@ function spawnAnvil(): Entity {
     positionComponent,
     spriteComponent,
     interactionComponent,
-    labelComponent,
     funnelComponent,
     anvilComponent,
     transformerComponent,
@@ -163,14 +157,12 @@ function spawnCoalpile(): Entity {
   const positionComponent = new PositionComponent(310, floorLevel - spriteHeight);
   const spriteComponent = new SpriteComponent(0, 0, 16, spriteHeight, '#888');
   const interactionComponent = new InteractionComponent();
-  const labelComponent = new LabelComponent('Coal pile');
   const spawnerComponent = new SpawnerComponent(Item.coal);
 
   coalpile.addComponents([
     positionComponent,
     spriteComponent,
     interactionComponent,
-    labelComponent,
     spawnerComponent,
   ]);
 
@@ -185,10 +177,9 @@ function spawnIronBox(): Entity {
   const positionComponent = new PositionComponent(205, floorLevel - spriteHeight);
   const spriteComponent = new SpriteComponent(0, 0, 16, spriteHeight, '#888');
   const interactionComponent = new InteractionComponent();
-  const labelComponent = new LabelComponent('Steel box');
   const spawnerComponent = new SpawnerComponent(Item.steel);
 
-  ironBox.addComponents([positionComponent, spriteComponent, interactionComponent, labelComponent, spawnerComponent]);
+  ironBox.addComponents([positionComponent, spriteComponent, interactionComponent, spawnerComponent]);
 
   return ironBox;
 }
@@ -245,7 +236,6 @@ class GameState implements State {
 
     const drawSystem = new DrawSystem(this.renderer);
     const controlsSystem = new ControlsSystem();
-    const highlightSystem = new HightlightSystem();
     const overlapSystem = new OverlapSystem(playerEntity);
     const furnaceSystem = new FurnaceSystem(this.renderer);
     const pickupsSystem = new PickupsSystem(playerEntity, this.ui);
@@ -260,7 +250,6 @@ class GameState implements State {
       controlsSystem,
 
       dropzoneSystem,
-      highlightSystem,
       overlapSystem,
       furnaceSystem,
       sharpenerSystem,
