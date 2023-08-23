@@ -21,6 +21,7 @@ module.exports = {
     'import/prefer-default-export': 'off',
     'guard-for-in': 'error',
     'arrow-parens': 'off',
+    'yoda': 'off',
     semi: 'warn',
     'arrow-body-style': 'off',
     'no-multiple-empty-lines': ['error', { max: 2, maxBOF: 1 }],

@@ -58,7 +58,6 @@ export class PickupsSystem extends System {
       }
 
       const positionComponent = entity.getComponent<PositionComponent>(ComponentTypes.Position);
-      console.log('PICKED ITEM: ', pickableComponent.item);
 
       if (controls.isX && !controls.previousState.isX) {
         pickableComponent.isPicked = false;

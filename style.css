@@ -10,6 +10,6 @@ html, body {
 
 #canvas {
     border: 1px solid red;
-    transform: scale(2);
+    transform: scale(3);
     image-rendering: pixelated;
 }

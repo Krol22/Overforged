@@ -3,6 +3,7 @@ import { PhysicsComponent } from '@/components/physics.component';
 import { PickableComponent } from '@/components/pickable.component';
 import { PlayerComponent } from '@/components/player.component';
 import { PositionComponent } from '@/components/position.component';
+import { SpriteComponent } from '@/components/sprite.component';
 import { controls } from '@/core/controls';
 import { System } from '@/core/ecs';
 
@@ -13,6 +14,7 @@ export class ControlsSystem extends System {
   constructor() {
     super([
       ComponentTypes.Position,
+      ComponentTypes.Sprite,
       ComponentTypes.Player,
       ComponentTypes.Physics,
     ]);
@@ -24,6 +26,12 @@ export class ControlsSystem extends System {
     const positionComponent = player.getComponent<PositionComponent>(ComponentTypes.Position);
     const physicsComponent = player.getComponent<PhysicsComponent>(ComponentTypes.Physics);
     const playerComponent = player.getComponent<PlayerComponent>(ComponentTypes.Player);
+    const spriteComponent = player.getComponent<SpriteComponent>(ComponentTypes.Sprite);
+
+    if (-1 < physicsComponent.vx && physicsComponent.vx < 1) {
+      physicsComponent.vx = 0;
+      spriteComponent.rotate = 0;
+    }
 
     if (playerComponent.pickedItem) {
       const item = this.allEntities.find(({ id }) => {
@@ -39,8 +47,40 @@ export class ControlsSystem extends System {
       playerComponent.hadItemPicked = false;
     }
 
+    if (spriteComponent.transformFlipX !== 0) {
+      spriteComponent.flipX += spriteComponent.transformFlipX * 0.3;
+
+      if (spriteComponent.flipX < -1) {
+        spriteComponent.transformFlipX = 0;
+        spriteComponent.flipX = -1;
+      }
+
+      if (spriteComponent.flipX > 1) {
+        spriteComponent.transformFlipX = 0;
+        spriteComponent.flipX = 1;
+      }
+    } 
+
     if (!playerComponent.hasMoveLocked) {
       this.movePlayer(positionComponent, physicsComponent);
+
+      if (physicsComponent.vx > 0) {
+        spriteComponent.transformFlipX = -1;
+      } else if (physicsComponent.vx < 0) {
+        spriteComponent.transformFlipX = 1;
+      }
+
+      if (physicsComponent.vx !== 0) {
+        spriteComponent.rotate += spriteComponent.rotateDir * 0.025;
+
+        if (spriteComponent.rotate > 0.12) {
+          spriteComponent.rotateDir *= -1;
+        }
+
+        if (spriteComponent.rotate < -0.12) {
+          spriteComponent.rotateDir *= -1;
+        }
+      }
     }
   }
 

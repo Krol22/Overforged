@@ -30,12 +30,12 @@ export class OverlapSystem extends System {
       interactionComponent.isOverlaping = interactionComponent.canInteractWith && aabb(
         playerPositionComponent.x,
         playerPositionComponent.y,
-        playerSpriteComponent.srcW,
-        playerSpriteComponent.srcH,
+        playerSpriteComponent.sw,
+        playerSpriteComponent.sh,
         positionComponent.x,
         positionComponent.y,
-        spriteComponent.srcW,
-        spriteComponent.srcH,
+        spriteComponent.dw,
+        spriteComponent.dh,
       );
     });
   }

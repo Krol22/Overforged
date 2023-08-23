@@ -61,6 +61,7 @@ export class FurnaceDropSystem extends System {
         return;
       }
       // furnace picked item from player
+      console.log(itemHolderComponent);
       if (itemHolderComponent.pickedEntityId) {
         const pickedItem = this.getEntity(itemHolderComponent.pickedEntityId);
         this.interactItemWithFurnace(pickedItem);
@@ -97,6 +98,5 @@ export class FurnaceDropSystem extends System {
     itemInteractionComponent.canInteractWith = false;
     steelComponent.heatCounter = 0;
     steelComponent.isHeated = false;
-    steelComponent.inFurnace = true;
   }
 }

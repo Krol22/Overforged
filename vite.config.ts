@@ -52,7 +52,7 @@ export default defineConfig(({ command, mode }) => {
       }
     };
     // @ts-ignore
-    config.plugins = [typescriptPlugin()]//, closurePlugin()];// , roadrollerPlugin(), ectPlugin()];
+    config.plugins = [typescriptPlugin(), ectPlugin()]//, closurePlugin()];// , roadrollerPlugin(), ectPlugin()];
   }
 
   return config;
@@ -201,7 +201,7 @@ function ectPlugin(): Plugin {
       try {
         const files = await fs.readdir('dist/');
         const assetFiles = files.filter(file => {
-          return !file.includes('.js') && !file.includes('.css') && !file.includes('.html') && !file.includes('.zip') && file !== 'assets';
+          return !file.includes('.css') && !file.includes('.html') && !file.includes('.zip') && file !== 'assets';
         }).map(file => 'dist/' + file);
         const args = ['-strip', '-zip', '-10009', 'dist/index.html', ...assetFiles];
         const result = execFileSync(ect, args);

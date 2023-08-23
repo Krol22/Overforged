@@ -24,25 +24,44 @@ export class DrawSystem extends System {
         return;
       }
 
-      if (!steelComponent) {
+      if (!spriteComponent.color) {
         this.renderer.drawSprite(
+          spriteComponent.sx,
+          spriteComponent.sy,
+          spriteComponent.sw,
+          spriteComponent.sh,
           positionComponent.x,
           positionComponent.y,
-          spriteComponent.srcW,
-          spriteComponent.srcH,
-          spriteComponent.color,
+          spriteComponent.dw,
+          spriteComponent.dh,
+          {
+            rotate: spriteComponent.rotate,
+            flipX: spriteComponent.flipX,
+          }
+        );
+
+        return;
+      }
+
+      if (!steelComponent) {
+        this.renderer.drawRect(
+          positionComponent.x,
+          positionComponent.y,
+          spriteComponent.sw,
+          spriteComponent.sh,
+          { color: spriteComponent.color },
         );
 
         return;
       }
 
       const color = steelComponent.isHeated ? '#ff0' : '#ddd';
-      this.renderer.drawSprite(
+      this.renderer.drawRect(
         positionComponent.x,
         positionComponent.y,
-        spriteComponent.srcW,
-        spriteComponent.srcH,
-        color,
+        spriteComponent.sw,
+        spriteComponent.sh,
+        { color },
       );
     });
   }

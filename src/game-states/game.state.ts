@@ -187,10 +187,10 @@ function spawnIronBox(): Entity {
 function spawnPlayer(): Entity {
   const playerEntity = new Entity();
 
-  const spriteHeight = 16;
+  const spriteHeight = 15;
 
   const positionComponent = new PositionComponent(90, floorLevel - spriteHeight);
-  const spriteComponent = new SpriteComponent(0, 0, 16, spriteHeight, '#fff');
+  const spriteComponent = new SpriteComponent(48, 18, 12, spriteHeight);
   const playerComponent = new PlayerComponent();
   const physicsComponent = new PhysicsComponent();
 

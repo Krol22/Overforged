@@ -45,12 +45,20 @@ export class DropzoneSystem extends System {
         return;
       }
 
+      // #TODO - there is definately better way
+      let canUseEntity = false;
+      if (playerPlayerComponent.pickedItem) {
+        const item = this.getEntity(playerPlayerComponent.pickedItem);
+        const pickableComponent = item.getComponent<PickableComponent>(ComponentTypes.Pickable);
+        canUseEntity = funnelComponent.itemTypes.includes(pickableComponent.item);
+      }
+
       if (controls.isConfirm && !controls.previousState.isConfirm) {
         if (itemHolderComponent.hasItemOn) {
             // switch items  
           const holdingItem = this.getEntity(itemHolderComponent.holdingItemId);
 
-          if (playerPlayerComponent.pickedItem) {
+          if (canUseEntity && playerPlayerComponent.pickedItem) {
             const playerPickedItem = this.getEntity(playerPlayerComponent.pickedItem);
             const pickable = playerPickedItem.getComponent<PickableComponent>(ComponentTypes.Pickable);
 
@@ -65,6 +73,7 @@ export class DropzoneSystem extends System {
 
             playerPlayerComponent.pickedItem = holdingItem.id;
             itemHolderComponent.holdingItemId = playerPickedItem.id;
+            itemHolderComponent.droppedEntityId = holdingItem.id;
             itemHolderComponent.pickedEntityId = itemHolderComponent.holdingItemId;
           } else {
             // pickup item
@@ -76,7 +85,7 @@ export class DropzoneSystem extends System {
             this.pickupItem(holdingItem);
           }
         } else {
-          if (playerPlayerComponent.pickedItem) {
+          if (canUseEntity && playerPlayerComponent.pickedItem) {
             const playerPickedItem = this.getEntity(playerPlayerComponent.pickedItem);
             const pickable = playerPickedItem.getComponent<PickableComponent>(ComponentTypes.Pickable);
 
@@ -100,13 +109,13 @@ export class DropzoneSystem extends System {
         return;
       }
 
-      const item = this.getEntity(playerPlayerComponent.pickedItem);
-      const pickableComponent = item.getComponent<PickableComponent>(ComponentTypes.Pickable);
 
-      if (!funnelComponent.itemTypes.includes(pickableComponent.item)) {
+      if (!canUseEntity) {
         return;
       }
 
+      const item = this.getEntity(playerPlayerComponent.pickedItem);
+      const pickableComponent = item.getComponent<PickableComponent>(ComponentTypes.Pickable);
       funnelComponent.canUseEntityId = item.id;
       this.ui.setActionText(`Press <SPACE> to drop ${pickableComponent.item} in ${funnelComponent.name}`);
     });
