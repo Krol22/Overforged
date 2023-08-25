@@ -5,6 +5,7 @@ import { FurnaceComponent } from '@/components/furnace.component';
 import { InteractionComponent } from '@/components/interaction.component';
 import { ItemHolderComponent } from '@/components/itemHolder.component';
 import { PhysicsComponent } from '@/components/physics.component';
+import { PickupBlockerComponent } from '@/components/pickupBlocker.component';
 import { PlayerComponent } from '@/components/player.component';
 import { PositionComponent } from '@/components/position.component';
 import { SharpenerComponent } from '@/components/sharpener.component';
@@ -22,21 +23,24 @@ import { DrawSystem } from '@/systems/draw.system';
 import { DropzoneSystem } from '@/systems/dropzone.system';
 import { FurnaceSystem } from '@/systems/furnace.system';
 import { FurnaceDropSystem } from '@/systems/furnaceDrop.system';
+import { ItemSpriteSystem } from '@/systems/itemSprite.system';
 import { OverlapSystem } from '@/systems/overlap.system';
+import { PhysicsSystem } from '@/systems/physics.system';
 import { PickupsSystem } from '@/systems/pickups.system';
 import { SharpenerSystem } from '@/systems/sharpener.system';
 import { SpawnSystem } from '@/systems/spawn.system';
 
 const floorLevel = 170;
+const rightWallX = 290;
 
 function spawnDesk(): Entity {
   const deskEntity = new Entity();
 
-  const spriteHeight = 24; 
+  const spriteHeight = 8; 
 
-  const positionComponent = new PositionComponent(50, floorLevel - spriteHeight);
-  const spriteComponent = new SpriteComponent(0, 0, 8, spriteHeight, '#888');
-  const interactionComponent = new InteractionComponent();
+  const positionComponent = new PositionComponent(rightWallX - 170, floorLevel - spriteHeight);
+  const spriteComponent = new SpriteComponent(34, 0, 16, spriteHeight);
+  const interactionComponent = new InteractionComponent(1, { x: 0, y: 0, w: 8, h: 24 });
   const funnelComponent = new FunnelComponent([
     Item.horseShoe,
     Item.weapon,
@@ -44,6 +48,7 @@ function spawnDesk(): Entity {
   ], 'desk');
   const deskComponent = new DeskComponent();
   const itemHolderComponent = new ItemHolderComponent();
+  const pickupBlockerComponent = new PickupBlockerComponent();
 
   deskEntity.addComponents([
     positionComponent,
@@ -52,6 +57,7 @@ function spawnDesk(): Entity {
     funnelComponent,
     deskComponent,
     itemHolderComponent,
+    pickupBlockerComponent,
   ]);
 
   return deskEntity;
@@ -60,17 +66,19 @@ function spawnDesk(): Entity {
 function spawnSharpener(): Entity {
   const sharpenerEntity = new Entity();
 
-  const spriteHeight = 16;
+  const spriteHeight = 8;
 
-  const positionComponent = new PositionComponent(90, floorLevel - spriteHeight);
-  const spriteComponent = new SpriteComponent(0, 0, 8, spriteHeight, '#888');
-  const interactionComponent = new InteractionComponent();
+  const positionComponent = new PositionComponent(rightWallX - 115, floorLevel - spriteHeight);
+  const spriteComponent = new SpriteComponent(13, 0, 7, spriteHeight);
+  const interactionComponent = new InteractionComponent(1, { x: 0, y: 0, w: 7, h: 9 });
   const transformerComponent = new TransformerComponent(sharpenerTransformerDefinition);
   const funnelComponent = new FunnelComponent([
     Item.weapon4,
     Item.tool2,
   ], 'sharpener');
+
   const sharpenerComponent = new SharpenerComponent();
+  const pickupBlockerComponent = new PickupBlockerComponent();
 
   sharpenerEntity.addComponents([
     positionComponent,
@@ -79,6 +87,7 @@ function spawnSharpener(): Entity {
     transformerComponent,
     funnelComponent,
     sharpenerComponent,
+    pickupBlockerComponent,
   ]);
 
   return sharpenerEntity;
@@ -87,12 +96,13 @@ function spawnSharpener(): Entity {
 function spawnFurnace(): Entity {
   const furnaceEntity = new Entity();
 
-  const spriteHeight = 48;
+  const spriteHeight = 20;
 
-  const positionComponent = new PositionComponent(250, floorLevel - spriteHeight);
-  const spriteComponent = new SpriteComponent(0, 0, 32, spriteHeight, '#888');
-  const interactionComponent = new InteractionComponent();
+  const positionComponent = new PositionComponent(rightWallX - 45, floorLevel - spriteHeight);
+  const spriteComponent = new SpriteComponent(0, 0, 13, spriteHeight);
+  const interactionComponent = new InteractionComponent(1, { x: 2, y: 2, w: 9, h: 14 });
   const itemHolderComponent = new ItemHolderComponent();
+  const pickupBlockerComponent = new PickupBlockerComponent();
 
   const funnelComponent = new FunnelComponent([
     Item.coal,
@@ -111,6 +121,7 @@ function spawnFurnace(): Entity {
     furnaceComponent,
     transformerComponent,
     itemHolderComponent,
+    pickupBlockerComponent,
   ]);
 
   return furnaceEntity;
@@ -119,12 +130,13 @@ function spawnFurnace(): Entity {
 function spawnAnvil(): Entity {
   const anvilEntity = new Entity();
 
-  const spriteHeight = 16;
+  const spriteHeight = 6;
 
-  const positionComponent = new PositionComponent(150, floorLevel - spriteHeight);
-  const spriteComponent = new SpriteComponent(0, 0, 16, spriteHeight, '#888');
-  const interactionComponent = new InteractionComponent();
+  const positionComponent = new PositionComponent(rightWallX - 98, floorLevel - spriteHeight);
+  const spriteComponent = new SpriteComponent(13, 13, 12, spriteHeight);
+  const interactionComponent = new InteractionComponent(1, { x: 0, y: 0, w: 12, h: 7 });
   const itemHolderComponent = new ItemHolderComponent();
+  const pickupBlockerComponent = new PickupBlockerComponent();
 
   const funnelComponent = new FunnelComponent([
     Item.hotSteel,
@@ -144,6 +156,7 @@ function spawnAnvil(): Entity {
     anvilComponent,
     transformerComponent,
     itemHolderComponent,
+    pickupBlockerComponent,
   ]);
 
   return anvilEntity;
@@ -152,18 +165,20 @@ function spawnAnvil(): Entity {
 function spawnCoalpile(): Entity {
   const coalpile = new Entity();
 
-  const spriteHeight = 16;
+  const spriteHeight = 7;
 
-  const positionComponent = new PositionComponent(310, floorLevel - spriteHeight);
-  const spriteComponent = new SpriteComponent(0, 0, 16, spriteHeight, '#888');
-  const interactionComponent = new InteractionComponent();
+  const positionComponent = new PositionComponent(rightWallX - 20, floorLevel - spriteHeight);
+  const spriteComponent = new SpriteComponent(13, 19, 14, spriteHeight);
+  const interactionComponent = new InteractionComponent(1, { x: 0, y: 0, w: 16, h: 16 });
   const spawnerComponent = new SpawnerComponent(Item.coal);
+  const pickupBlockerComponent = new PickupBlockerComponent();
 
   coalpile.addComponents([
     positionComponent,
     spriteComponent,
     interactionComponent,
     spawnerComponent,
+    pickupBlockerComponent,
   ]);
 
   return coalpile;
@@ -172,14 +187,21 @@ function spawnCoalpile(): Entity {
 function spawnIronBox(): Entity {
   const ironBox = new Entity();
 
-  const spriteHeight = 16;
+  const spriteHeight = 8;
 
-  const positionComponent = new PositionComponent(205, floorLevel - spriteHeight);
-  const spriteComponent = new SpriteComponent(0, 0, 16, spriteHeight, '#888');
-  const interactionComponent = new InteractionComponent();
+  const positionComponent = new PositionComponent(rightWallX - 67, floorLevel - spriteHeight);
+  const spriteComponent = new SpriteComponent(0, 20, 11, spriteHeight);
+  const interactionComponent = new InteractionComponent(1, { x: 0, y: 0, w: 16, h: 16 });
   const spawnerComponent = new SpawnerComponent(Item.steel);
+  const pickupBlockerComponent = new PickupBlockerComponent();
 
-  ironBox.addComponents([positionComponent, spriteComponent, interactionComponent, spawnerComponent]);
+  ironBox.addComponents([
+    positionComponent,
+    spriteComponent,
+    interactionComponent,
+    spawnerComponent, 
+    pickupBlockerComponent,
+  ]);
 
   return ironBox;
 }
@@ -187,10 +209,10 @@ function spawnIronBox(): Entity {
 function spawnPlayer(): Entity {
   const playerEntity = new Entity();
 
-  const spriteHeight = 15;
+  const spriteHeight = 14;
 
-  const positionComponent = new PositionComponent(90, floorLevel - spriteHeight);
-  const spriteComponent = new SpriteComponent(48, 18, 12, spriteHeight);
+  const positionComponent = new PositionComponent(rightWallX - 145, floorLevel - spriteHeight);
+  const spriteComponent = new SpriteComponent(32, 26, 12, spriteHeight);
   const playerComponent = new PlayerComponent();
   const physicsComponent = new PhysicsComponent();
 
@@ -236,7 +258,7 @@ class GameState implements State {
 
     const drawSystem = new DrawSystem(this.renderer);
     const controlsSystem = new ControlsSystem();
-    const overlapSystem = new OverlapSystem(playerEntity);
+    const overlapSystem = new OverlapSystem(playerEntity, this.renderer);
     const furnaceSystem = new FurnaceSystem(this.renderer);
     const pickupsSystem = new PickupsSystem(playerEntity, this.ui);
     const dropzoneSystem = new DropzoneSystem(playerEntity, this.ui);
@@ -245,6 +267,8 @@ class GameState implements State {
     const anvilSystem = new AnvilSystem(this.renderer, this.ui);
     const sharpenerSystem = new SharpenerSystem(playerEntity, this.renderer, this.ui);
     const deskSystem = new DeskSystem(playerEntity);
+    const physicsSystem = new PhysicsSystem();
+    const itemSpriteSystem = new ItemSpriteSystem();
 
     this.ecs.addSystems([
       controlsSystem,
@@ -257,7 +281,9 @@ class GameState implements State {
       anvilSystem,
       deskSystem,
       pickupsSystem,
+      itemSpriteSystem,
 
+      physicsSystem,
       drawSystem,
       spawnSystem,
     ]);
@@ -270,6 +296,11 @@ class GameState implements State {
     this.ui.clear();
 
     this.ecs.update(dt);
+    this.renderer.drawOrnaments();
+    this.renderer.drawCelling();
+    this.renderer.drawSplitWall();
+    this.renderer.drawRightWall();
+    this.renderer.drawFloor();
     this.ui.draw();
   }
 }

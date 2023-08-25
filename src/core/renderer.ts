@@ -1,5 +1,5 @@
 import font from '../assets/font.png';
-import sprite from '../assets/sprites.png';
+import sprite from '../assets/assets.png';
 import { characters } from './font';
 
 export const LETTER_WIDTH = 5;
@@ -57,10 +57,9 @@ export class Renderer {
   }
 
   drawSprite(sx: number, sy: number, sw: number, sh: number, dx: number, dy: number, dw: number, dh: number, options?: SpriteOptions) {
-    this.drawRect(dx, dy, dw, dh, { lineWidth: 1, color: '#f00' });
     this.context.save();
 
-    this.context.translate(Math.floor(dx) + dw / 2, Math.floor(dy) + dh / 2);
+    this.context.translate(Math.floor(dx) + Math.floor(dw / 2), Math.floor(dy) + Math.floor(dh / 2));
 
     const rotate = options?.rotate ?? 0;
     const flipX = options?.flipX;
@@ -73,7 +72,7 @@ export class Renderer {
 
     this.context.drawImage(
       this.spriteImage,
-      sx, sy, sw, sh, -dw / 2, -dh / 2, dw, dh,
+      sx, sy, sw, sh, -Math.floor(dw / 2), -Math.floor(dh / 2), dw, dh,
     );
 
     this.context.restore();
@@ -108,8 +107,68 @@ export class Renderer {
     }
   }
 
+  drawCelling() {
+    this.drawRect(0, 0, this.canvasWidth, 124, { color: '#000', fill: true });
+
+    for (let i = 0; i < 300; i += 5) {
+      this.context.drawImage(
+        this.spriteImage,
+        3, 25, 5, 3, i, 120, 5, 3,
+      );
+    }
+  }
+
+  drawFloor() {
+    this.drawRect(0, 170, this.canvasWidth, 600, { color: '#000', fill: true });
+
+    for (let i = 0; i < 302; i += 5) {
+      this.context.drawImage(
+        this.spriteImage,
+        13, 8, 5, 5, i, 170, 5, 5,
+      );
+    }
+  }
+
+  drawRightWall() {
+    this.drawRect(299, 100, this.canvasWidth, 500, { color: '#000', fill: true });
+
+    for (let i = 120; i < this.canvasHeight; i += 5) {
+      this.context.drawImage(
+        this.spriteImage,
+        8, 8, 5, 5, 300, i, 5, 5,
+      );
+    }
+  }
+
+  drawSplitWall() {
+    this.drawRect(158, 124, 5, 26, { color: '#000', fill: true });
+
+    for (let i = 124; i < 146; i += 5) {
+      this.drawSprite(
+        13, 8, 5, 4, 159, i, 5, 4,
+        {
+          rotate: Math.PI / 2
+        }
+      );
+    }
+  }
+
+  drawOrnaments() {
+    this.drawSprite(20, 2, 7, 6, 220, 134, 7, 6);
+    this.drawSprite(20, 2, 7, 6, 228, 136, 7, 6);
+    this.drawSprite(20, 2, 7, 6, 234, 132, 7, 6);
+
+    this.drawSprite(0, 36, 10, 10, 274, 128, 10, 10, {
+      rotate: Math.PI,
+    });
+
+    this.drawSprite(0, 36, 10, 10, 272, 128, 10, 10, {
+      rotate: Math.PI / 2,
+    });
+  }
+
   clear() {
-    this.context.fillStyle = '#000';
+    this.context.fillStyle = '#3d453d';
     this.context.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
   }
 }

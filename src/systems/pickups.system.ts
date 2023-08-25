@@ -1,8 +1,10 @@
 import { ComponentTypes } from '@/components/component.types';
 import { InteractionComponent } from '@/components/interaction.component';
+import { PhysicsComponent } from '@/components/physics.component';
 import { PickableComponent } from '@/components/pickable.component';
 import { PlayerComponent } from '@/components/player.component';
 import { PositionComponent } from '@/components/position.component';
+import { SpriteComponent } from '@/components/sprite.component';
 import { controls } from '@/core/controls';
 import { Entity, System } from '@/core/ecs';
 import { UI } from '@/core/ui';
@@ -32,12 +34,12 @@ export class PickupsSystem extends System {
 
       if (!pickableComponent.isPicked) {
         if (interactionComponent.isOverlaping) {
-          this.ui.setActionText(`Press <SPACE> to pick ${pickableComponent.item}`);
+          this.ui.setActionText(`Press <X> to pick ${pickableComponent.item}`);
         }
 
         if (
           interactionComponent.isOverlaping
-          && controls.isConfirm && !controls.previousState.isConfirm
+          && controls.isX && !controls.previousState.isX
         ) {
 
           // If player has picketItem drop it
@@ -58,16 +60,19 @@ export class PickupsSystem extends System {
       }
 
       const positionComponent = entity.getComponent<PositionComponent>(ComponentTypes.Position);
+      const spriteComponent = entity.getComponent<SpriteComponent>(ComponentTypes.Sprite);
 
       if (controls.isX && !controls.previousState.isX) {
+        const physicsComponent = entity.getComponent<PhysicsComponent>(ComponentTypes.Physics);
+        physicsComponent.vy = -3;
+
         pickableComponent.isPicked = false;
-        positionComponent.y = 170 - 4;
         playerPlayerComponent.pickedItem = undefined;
         return;
       }
 
-      positionComponent.x = playerPositionComponent.x;
-      positionComponent.y = 170 - 16 - 24;
+      positionComponent.x = Math.floor(playerPositionComponent.x + spriteComponent.dw / 2);
+      positionComponent.y = 170 - 22;
     });
   }
 }

@@ -20,7 +20,7 @@ export class SpriteComponent extends Component {
   public defaultColor?: string = '#fff';
   public visible: boolean = true;
 
-  constructor(sx: number, sy: number, sw: number, sh: number, color?: string) {
+  constructor(sx: number, sy: number, sw: number, sh: number) {
     super(ComponentTypes.Sprite);
 
     this.sx = sx;
@@ -30,8 +30,5 @@ export class SpriteComponent extends Component {
 
     this.dw = sw;
     this.dh = sh;
-
-    this.color = color;
-    this.defaultColor = color;
   }
 }

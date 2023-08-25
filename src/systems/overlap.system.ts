@@ -3,12 +3,16 @@ import { InteractionComponent } from '@/components/interaction.component';
 import { PositionComponent } from '@/components/position.component';
 import { SpriteComponent } from '@/components/sprite.component';
 import { Entity, System } from '@/core/ecs';
+import { Renderer } from '@/core/renderer';
 import { aabb } from '@/utils/aabb';
+
+const debug = false;
 
 export class OverlapSystem extends System {
   public playerEntity: Entity;
+  public renderer: Renderer;
 
-  constructor(playerEntity: Entity) {
+  constructor(playerEntity: Entity, renderer: Renderer) {
     super([
       ComponentTypes.Interaction,
       ComponentTypes.Sprite,
@@ -16,6 +20,7 @@ export class OverlapSystem extends System {
     ]);
 
     this.playerEntity = playerEntity;
+    this.renderer = renderer;
   }
 
   public update(_dt: number): void {
@@ -32,11 +37,26 @@ export class OverlapSystem extends System {
         playerPositionComponent.y,
         playerSpriteComponent.sw,
         playerSpriteComponent.sh,
-        positionComponent.x,
-        positionComponent.y,
-        spriteComponent.dw,
-        spriteComponent.dh,
+        positionComponent.x + interactionComponent.box.x,
+        positionComponent.y + interactionComponent.box.y,
+        interactionComponent.box.w,
+        interactionComponent.box.h,
       );
+
+      if (debug && spriteComponent.visible) {
+        const color = interactionComponent.isOverlaping ? '#f00' : '#0ff';
+
+        this.renderer.drawRect(
+          positionComponent.x + interactionComponent.box.x,
+          positionComponent.y + interactionComponent.box.y,
+          interactionComponent.box.w,
+          interactionComponent.box.h,
+          {
+            color,
+            lineWidth: 2,
+          },
+        );
+      }
     });
   }
 }

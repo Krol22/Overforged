@@ -2,6 +2,7 @@ import { ComponentTypes } from '@/components/component.types';
 import { FunnelComponent } from '@/components/funnel.component';
 import { FurnaceComponent } from '@/components/furnace.component';
 import { ItemHolderComponent } from '@/components/itemHolder.component';
+import { PositionComponent } from '@/components/position.component';
 import { SpriteComponent } from '@/components/sprite.component';
 import { MaxHeatLevel, SteelComponent } from '@/components/steel.component';
 import { System } from '@/core/ecs';
@@ -15,6 +16,7 @@ export class FurnaceSystem extends System {
 
   constructor(renderer: Renderer) {
     super([
+      ComponentTypes.Position,
       ComponentTypes.Furnace,
       ComponentTypes.Funnel,
       ComponentTypes.ItemHolder,
@@ -26,11 +28,15 @@ export class FurnaceSystem extends System {
 
   public update(_dt: number): void {
     this.systemEntities.map((entity) => {
+      const positionComponent = entity.getComponent<PositionComponent>(ComponentTypes.Position);
       const furnaceComponent = entity.getComponent<FurnaceComponent>(ComponentTypes.Furnace);
       const funnelComponent = entity.getComponent<FunnelComponent>(ComponentTypes.Funnel);
       const itemHolderComponent = entity.getComponent<ItemHolderComponent>(ComponentTypes.ItemHolder);
 
       // Heating furnace itself
+      // console.log(furnaceComponent.fuel);
+      // console.log(furnaceComponent.temperature);
+
       if (furnaceComponent.fuel > 0 && furnaceComponent.fuelCounter === 0) {
         furnaceComponent.fuel -= 1;
         furnaceComponent.fuelCounter = FuelEfficency;
@@ -75,26 +81,39 @@ export class FurnaceSystem extends System {
       }
 
       // Heat level UI
-      const progress = 80 * furnaceComponent.temperature / 100;
-
-      this.renderer.drawRect(
-        this.renderer.canvasWidth - 40,
-        40 + 80 - progress,
-        20,
-        progress,
-        { color: '#f00', fill: true },
+      this.renderer.drawSprite(
+        44,
+        8,
+        4,
+        15,
+        positionComponent.x + 16,
+        positionComponent.y - 8,
+        4,
+        15,
       );
-      this.renderer.drawRect(this.renderer.canvasWidth - 40, 40, 20, 80, { color: '#fff', lineWidth: 2 });
 
-      const spriteComponent = entity.getComponent<SpriteComponent>(ComponentTypes.Sprite);
+      let heatLevel = furnaceComponent.temperature / 34;
+
+      this.renderer.drawSprite(
+        27,
+        15,
+        5,
+        6,
+        positionComponent.x + 3,
+        positionComponent.y + 14 - heatLevel,
+        5,
+        6,
+      );
+
+      // const spriteComponent = entity.getComponent<SpriteComponent>(ComponentTypes.Sprite);
       if (itemHolderComponent.hasItemOn) {
-        spriteComponent.color = '#ccc';
+        // spriteComponent.color = '#ccc';
 
         if (furnaceComponent.entityHeated) {
-          spriteComponent.color = '#cc0';
+          // spriteComponent.color = '#cc0';
         }
       } else {
-        spriteComponent.color = '#888';
+        // spriteComponent.color = '#888';
       }
     });
   }

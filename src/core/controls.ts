@@ -28,6 +28,7 @@ class Controls {
   queryController() {
     this.previousState.isConfirm = this.isConfirm;
     this.previousState.isEscape = this.isEscape;
+    this.previousState.isX = this.isX;
 
     const leftVal = (this.keyMap.get('KeyA') || this.keyMap.get('ArrowLeft')) ? -1 : 0;
     const rightVal = (this.keyMap.get('KeyD') || this.keyMap.get('ArrowRight')) ? 1 : 0;

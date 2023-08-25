@@ -53,6 +53,17 @@ export class DropzoneSystem extends System {
         canUseEntity = funnelComponent.itemTypes.includes(pickableComponent.item);
       }
 
+      // TESTING
+      if (canUseEntity) {
+        if (itemHolderComponent.hasItemOn) {
+          this.ui.setActionText('Switch')
+        } else {
+          this.ui.setActionText('Put');
+        }
+      } else if (itemHolderComponent.hasItemOn) {
+        this.ui.setActionText('Take');
+      }
+
       if (controls.isConfirm && !controls.previousState.isConfirm) {
         if (itemHolderComponent.hasItemOn) {
             // switch items  
@@ -117,7 +128,7 @@ export class DropzoneSystem extends System {
       const item = this.getEntity(playerPlayerComponent.pickedItem);
       const pickableComponent = item.getComponent<PickableComponent>(ComponentTypes.Pickable);
       funnelComponent.canUseEntityId = item.id;
-      this.ui.setActionText(`Press <SPACE> to drop ${pickableComponent.item} in ${funnelComponent.name}`);
+      // this.ui.setActionText(`Press <SPACE> to drop ${pickableComponent.item} in ${funnelComponent.name}`);
     });
   }
 
@@ -127,6 +138,9 @@ export class DropzoneSystem extends System {
 
     const pickable = item.getComponent<PickableComponent>(ComponentTypes.Pickable);
     pickable.isPicked = true;
+
+    const interaction = item.getComponent<InteractionComponent>(ComponentTypes.Interaction);
+    interaction.canInteractWith = true;
   }
 
   private dropItem(item: Entity) {
@@ -135,5 +149,8 @@ export class DropzoneSystem extends System {
 
     const pickable = item.getComponent<PickableComponent>(ComponentTypes.Pickable);
     pickable.isPicked = false;
+
+    const interaction = item.getComponent<InteractionComponent>(ComponentTypes.Interaction);
+    interaction.canInteractWith = false;
   }
 }

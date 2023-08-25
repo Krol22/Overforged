@@ -40,9 +40,10 @@ export class ControlsSystem extends System {
 
       if (item) {
         const pickableComponent = item.getComponent<PickableComponent>(ComponentTypes.Pickable);
-        // console.log("Picked Item: ", pickableComponent.item);
+
+        playerComponent.hadItemPicked = true;
+        playerComponent.previousPickedItem = item.id;
       }
-      playerComponent.hadItemPicked = true;
     } else {
       playerComponent.hadItemPicked = false;
     }
@@ -97,6 +98,14 @@ export class ControlsSystem extends System {
     }
 
     positionComponent.x += physicsComponent.vx;
+
+    if (positionComponent.x < 129) {
+      positionComponent.x = 129;
+    }
+
+    if (positionComponent.x >= 288) {
+      positionComponent.x = 288;
+    }
 
     if (physicsComponent.vx !== 0) {
       physicsComponent.vx *= DAMP;

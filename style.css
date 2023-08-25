@@ -2,14 +2,25 @@
 html, body {
     margin: 0;
     background-color: black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     height: 100%;
+    position: relative;
 }
 
 #canvas {
-    border: 1px solid red;
-    transform: scale(3);
+    transform: scale(4);
     image-rendering: pixelated;
+}
+
+.game {
+    position: absolute;
+    top: 40%;
+    left: 60%;
+    transform: translate(-50%, -50%);
+}
+
+.background { 
+    position: absolute;
+    transform: scale(4);
+    inset: 0;
+    background: linear-gradient(to right, #000, transparent 10%);
 }

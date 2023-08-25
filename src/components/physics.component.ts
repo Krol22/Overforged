@@ -7,9 +7,9 @@ export class PhysicsComponent extends Component {
   vx: number = 0;
   vy: number = 0;
 
-  affectedByGravity: number = 0;
+  affectedByGravity: boolean = false;
 
   constructor() {
-    super(ComponentTypes.Physics)
+    super(ComponentTypes.Physics);
   }
 }

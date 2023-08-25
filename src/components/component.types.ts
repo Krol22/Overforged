@@ -8,6 +8,7 @@ export enum ComponentTypes {
   Interaction,
   Label,
   Pickable,
+  PickupBlocker,
   Physics,
   Spawner,
   Funnel,

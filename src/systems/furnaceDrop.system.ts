@@ -45,8 +45,8 @@ export class FurnaceDropSystem extends System {
       }
       
       // handle coals
-      if (controls.isConfirm && !controls.previousState.isConfirm && playerPlayerComponent.pickedItem) {
-        const id = itemHolderComponent.pickedEntityId || playerPlayerComponent.pickedItem;
+      if (controls.isConfirm && !controls.previousState.isConfirm && playerPlayerComponent.previousPickedItem) {
+        const id = itemHolderComponent.pickedEntityId || playerPlayerComponent.previousPickedItem;
         const playerItem = this.getEntity(id);
         const pickableComponent = playerItem.getComponent<PickableComponent>(ComponentTypes.Pickable);
 
@@ -61,7 +61,6 @@ export class FurnaceDropSystem extends System {
         return;
       }
       // furnace picked item from player
-      console.log(itemHolderComponent);
       if (itemHolderComponent.pickedEntityId) {
         const pickedItem = this.getEntity(itemHolderComponent.pickedEntityId);
         this.interactItemWithFurnace(pickedItem);
@@ -92,10 +91,7 @@ export class FurnaceDropSystem extends System {
   }
 
   private interactItemWithFurnace(item: Entity) {
-    const itemInteractionComponent = item.getComponent<InteractionComponent>(ComponentTypes.Interaction);
-
     const steelComponent = item.getComponent<SteelComponent>(ComponentTypes.Steel);
-    itemInteractionComponent.canInteractWith = false;
     steelComponent.heatCounter = 0;
     steelComponent.isHeated = false;
   }

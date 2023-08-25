@@ -1,5 +1,6 @@
 import { ComponentTypes } from '@/components/component.types';
 import { InteractionComponent } from '@/components/interaction.component';
+import { PhysicsComponent } from '@/components/physics.component';
 import { PickableComponent } from '@/components/pickable.component';
 import { PlayerComponent } from '@/components/player.component';
 import { PositionComponent } from '@/components/position.component';
@@ -13,13 +14,14 @@ import { UI } from '@/core/ui';
 function spawnCoal(): Entity {
   const coal = new Entity();
 
-  const spriteHeight = 4;
+  const spriteHeight = 5;
 
   const positionComponent = new PositionComponent(Math.random() * 50, 170 - spriteHeight);
-  const spriteComponent = new SpriteComponent(0, 0, 8, spriteHeight, '#888');
-  const interactionComponent = new InteractionComponent();
+  const spriteComponent = new SpriteComponent(18, 8, 6, spriteHeight);
+  const interactionComponent = new InteractionComponent(2, { x: 0, y: 0, w: 8, h: 4 });
   const pickableComponent = new PickableComponent(Item.coal, true);
-
+  const physicsComponent = new PhysicsComponent();
+  physicsComponent.affectedByGravity = true;
   pickableComponent.isPicked = true;
 
   coal.addComponents([
@@ -27,6 +29,7 @@ function spawnCoal(): Entity {
     spriteComponent,
     interactionComponent,
     pickableComponent,
+    physicsComponent,
   ]);
 
   return coal;
@@ -35,12 +38,14 @@ function spawnCoal(): Entity {
 function spawnSteel(): Entity {
   const steel = new Entity();
 
-  const spriteHeight = 8;
+  const spriteHeight = 7;
   const positionComponent = new PositionComponent(Math.random() * 50, 170 - spriteHeight);
-  const spriteComponent = new SpriteComponent(0, 0, 2, spriteHeight, '#ddd');
-  const interactionComponent = new InteractionComponent();
+  const spriteComponent = new SpriteComponent(25, 8, 7, spriteHeight);
+  const interactionComponent = new InteractionComponent(2, { x: 0, y: 0, w: 2, h: 8 });
   const pickableComponent = new PickableComponent(Item.steel);
   const steelComponent = new SteelComponent();
+  const physicsComponent = new PhysicsComponent();
+  physicsComponent.affectedByGravity = true;
 
   pickableComponent.isPicked = true;
 
@@ -50,6 +55,7 @@ function spawnSteel(): Entity {
     interactionComponent,
     pickableComponent,
     steelComponent,
+    physicsComponent,
   ]);
 
   return steel;
