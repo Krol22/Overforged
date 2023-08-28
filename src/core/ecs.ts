@@ -1,5 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
 import { generateRandomId } from '@/utils/generateId';
+import { GameData } from './gameData';
 
 export abstract class Component {
   public type: number;
@@ -15,6 +16,8 @@ export class Entity {
   public id: string;
   public components: Record<number, Component> = {};
 
+  public wasUpdated: boolean = false;
+
   constructor() {
     this.id = generateRandomId();
   }
@@ -23,6 +26,8 @@ export class Entity {
     components.forEach((component) => {
       this.components[component.type] = component;
     });
+
+    this.wasUpdated = true;
   }
 
   hasEvery(types: Array<number>) {
@@ -36,8 +41,10 @@ export class Entity {
 
 export abstract class System {
   public componentTypes: Array<number> = [];
+
   protected systemEntities: Array<Entity> = [];
   protected allEntities: Array<Entity> = [];
+  protected gameData: GameData = new GameData(); 
 
   public markedToRemoveEntities: Array<string> = [];
   public newEntities: Array<Entity> = [];
@@ -68,6 +75,10 @@ export abstract class System {
     return entity;
   }
 
+  public attachGameData(gameData: GameData) {
+    this.gameData = gameData;
+  }
+
   public addEntity(entity: Entity) {
     this.newEntities.push(entity);
   }
@@ -80,6 +91,7 @@ export abstract class System {
 }
 
 export class ECS {
+  private gameData: GameData;
   private isRunning = false;
 
   private entities: Entity[] = [];
@@ -87,6 +99,10 @@ export class ECS {
 
   private entitiesToRemove: Array<string> = [];
   private entitiesToAdd: Array<Entity> = [];
+
+  constructor(gameData: GameData) {
+    this.gameData = gameData;
+  }
 
   addEntities(entities: Entity[]) {
     this.entities.push(...entities);
@@ -108,6 +124,9 @@ export class ECS {
   addSystems(systems: System[]) {
     // Systems will be added only on start no need to check isRunning
     this.systems.push(...systems);
+    this.systems.forEach((s) => {
+      s.attachGameData(this.gameData);
+    });
   }
 
   start() {
@@ -150,6 +169,11 @@ export class ECS {
     if (this.entitiesToRemove.length > 0) {
       this.removeEntities(this.entitiesToRemove);
       this.entitiesToRemove = [];
+    }
+
+    const updatedEntities = this.entities.filter((e) => e.wasUpdated);
+    if (updatedEntities.length > 0) {
+      this.updateSystemEntities();
     }
   }
 }

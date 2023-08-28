@@ -46,6 +46,7 @@ export class ControlsSystem extends System {
       }
     } else {
       playerComponent.hadItemPicked = false;
+      playerComponent.previousPickedItem = undefined;
     }
 
     if (spriteComponent.transformFlipX !== 0) {

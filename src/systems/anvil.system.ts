@@ -4,8 +4,10 @@ import { FunnelComponent } from '@/components/funnel.component';
 import { InteractionComponent } from '@/components/interaction.component';
 import { ItemHolderComponent } from '@/components/itemHolder.component';
 import { PickableComponent } from '@/components/pickable.component';
+import { PlayerComponent } from '@/components/player.component';
 import { PositionComponent } from '@/components/position.component';
 import { Item } from '@/components/spawner.component';
+import { ThrowComponent } from '@/components/throw.component';
 import { controls } from '@/core/controls';
 import { Entity, System } from '@/core/ecs';
 import { Renderer } from '@/core/renderer';
@@ -14,79 +16,58 @@ import { UI } from '@/core/ui';
 export class AnvilSystem extends System {
   private renderer: Renderer;
   private ui: UI;
+  private playerEntity: Entity;
 
-  constructor(renderer: Renderer, ui: UI) {
+  constructor(playerEntity: Entity, renderer: Renderer, ui: UI) {
     super([
       ComponentTypes.Anvil,
       ComponentTypes.Interaction,
       ComponentTypes.Funnel,
       ComponentTypes.Position,
-      ComponentTypes.ItemHolder,
     ]);
 
     this.renderer = renderer;
     this.ui = ui;
+    this.playerEntity = playerEntity;
   }
 
   public update(_dt: number): void {
     this.systemEntities.map((entity) => {
       const funnelComponent = entity.getComponent<FunnelComponent>(ComponentTypes.Funnel);
-      const anvilComponent = entity.getComponent<AnvilComponent>(ComponentTypes.Anvil);
       const interactionComponent = entity.getComponent<InteractionComponent>(ComponentTypes.Interaction);
-      const itemHolderComponent = entity.getComponent<ItemHolderComponent>(ComponentTypes.ItemHolder);
-
-      funnelComponent.isLocked = false;
 
       if (!interactionComponent.isOverlaping) {
         return;
       }
 
-      if (itemHolderComponent.pickedEntityId) {
-        anvilComponent.isPlacedItemReady = false;
-      }
-
-      if (itemHolderComponent.hasItemOn) {
-        const anvilItem = this.getEntity(itemHolderComponent.holdingItemId);
+      if (funnelComponent.canUseEntityId) {
+        const anvilItem = this.getEntity(funnelComponent.canUseEntityId);
         const pickableComponent = anvilItem.getComponent<PickableComponent>(ComponentTypes.Pickable);
-        funnelComponent.isLocked = true;
 
         if (pickableComponent.item === Item.hotSteel) {
-          this.handleForgePlacedItem(entity, pickableComponent);
+          this.handleForgePlacedItem(entity, anvilItem);
         }
 
-        if (anvilComponent.isPlacedItemReady) {
-          this.ui.setActionText(`Press <SPACE> to take from anvil.`);
-          funnelComponent.isLocked = false;
-        }
-
-        if (!anvilComponent.isPlacedItemReady) {
-          this.ui.setActionText(`Press <SPACE> to forge.`);
-          if (controls.isConfirm && !controls.previousState.isConfirm) {
-            this.handleTransformPlacedItem(entity, pickableComponent);
-          }
-        }
-      } else {
-        funnelComponent.isLocked = false;
       }
     });
   }
 
-  private handleForgePlacedItem(anvil: Entity, pickableComponent: PickableComponent) {
+  private handleForgePlacedItem(anvil: Entity, anvilItem: Entity) {
+    const pickableComponent = anvilItem.getComponent<PickableComponent>(ComponentTypes.Pickable);
     const positionComponent = anvil.getComponent<PositionComponent>(ComponentTypes.Position);
-    const anvilComponent = anvil.getComponent<AnvilComponent>(ComponentTypes.Anvil);
 
-    this.renderer.drawText("Press 1 2 3", positionComponent.x, positionComponent.y - 24, { size: 1 });
+    this.ui.showAnvilMenu(positionComponent.x + 4, positionComponent.y - 36);
+    this.ui.setActionText('Press <NUMBER> to forge weapon');
 
     if (controls.is1 && !controls.previousState.is1) {
       pickableComponent.item = Item.horseShoe;
       pickableComponent.disposable = true;
-      anvilComponent.isPlacedItemReady = true;
+
+      this.addHorseShoeThrowCapabilities(anvilItem);
     } else if (controls.is2 && !controls.previousState.is2) {
       pickableComponent.item = Item.tool1;
-      anvilComponent.isPlacedItemReady = false;
     } else if (controls.is3 && !controls.previousState.is3) {
       pickableComponent.item = Item.weapon1;
-      anvilComponent.isPlacedItemReady = true;
     }
   }
 
@@ -95,7 +76,6 @@ export class AnvilSystem extends System {
 
     if (pickableComponent.item === Item.weapon3) {
       pickableComponent.item = Item.weapon4;
-      anvilComponent.isPlacedItemReady = true;
     }
 
     if (pickableComponent.item === Item.weapon2) {
@@ -104,7 +84,14 @@ export class AnvilSystem extends System {
 
     if (pickableComponent.item === Item.tool1) {
       pickableComponent.item = Item.tool2;
-      anvilComponent.isPlacedItemReady = true;
     }
+  }
+
+  private addHorseShoeThrowCapabilities(horseShoe: Entity) {
+    const throwComponent = new ThrowComponent(1, false); 
+
+    throwComponent.rotationSpeed = 0.1;
+
+    horseShoe.addComponents([throwComponent]);
   }
 }

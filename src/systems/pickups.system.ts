@@ -4,6 +4,7 @@ import { PhysicsComponent } from '@/components/physics.component';
 import { PickableComponent } from '@/components/pickable.component';
 import { PlayerComponent } from '@/components/player.component';
 import { PositionComponent } from '@/components/position.component';
+import { Item } from '@/components/spawner.component';
 import { SpriteComponent } from '@/components/sprite.component';
 import { controls } from '@/core/controls';
 import { Entity, System } from '@/core/ecs';
@@ -27,6 +28,7 @@ export class PickupsSystem extends System {
   public update(_dt: number): void {
     const playerPositionComponent = this.playerEntity.getComponent<PositionComponent>(ComponentTypes.Position);
     const playerPlayerComponent = this.playerEntity.getComponent<PlayerComponent>(ComponentTypes.Player);
+    const playerSpriteComponent = this.playerEntity.getComponent<SpriteComponent>(ComponentTypes.Sprite);
 
     this.systemEntities.map((entity) => {
       const pickableComponent = entity.getComponent<PickableComponent>(ComponentTypes.Pickable);
@@ -61,18 +63,46 @@ export class PickupsSystem extends System {
 
       const positionComponent = entity.getComponent<PositionComponent>(ComponentTypes.Position);
       const spriteComponent = entity.getComponent<SpriteComponent>(ComponentTypes.Sprite);
+      const physicsComponent = entity.getComponent<PhysicsComponent>(ComponentTypes.Physics);
 
-      if (controls.isX && !controls.previousState.isX) {
-        const physicsComponent = entity.getComponent<PhysicsComponent>(ComponentTypes.Physics);
+      if (controls.isX && !controls.previousState.isX && !entity.hasEvery([ComponentTypes.Throw])) {
         physicsComponent.vy = -3;
-
         pickableComponent.isPicked = false;
         playerPlayerComponent.pickedItem = undefined;
         return;
       }
 
-      positionComponent.x = Math.floor(playerPositionComponent.x + spriteComponent.dw / 2);
-      positionComponent.y = 170 - 22;
+      if (controls.isConfirm && !controls.previousState.isConfirm && entity.hasEvery([ComponentTypes.Throw])) {
+        physicsComponent.ax = -0.5;
+        physicsComponent.affectedByGravity = false;
+        positionComponent.y = 170 - 12;
+        playerSpriteComponent.transformFlipX = 1;
+        pickableComponent.isPicked = false;
+        playerPlayerComponent.pickedItem = undefined;
+        return;
+      }
+
+      const { x, y } = getPickableOffset(pickableComponent.item);
+
+      positionComponent.x = Math.floor(playerPositionComponent.x + spriteComponent.dw / 2) + x;
+      positionComponent.y = 170 + y;
+      spriteComponent.flipX = playerSpriteComponent.flipX;
     });
   }
 }
+
+function getPickableOffset(type: Item): { x: number, y: number } {
+  if (type === Item.coal) {
+    return { x: -0, y: -12 };
+  }
+
+  if (type === Item.weapon1) {
+    return { x: -4, y: -12 };
+  }
+
+  if (type === Item.tool1) {
+    return { x: -2, y: -12 };
+  }
+
+  return { x: 0, y: -12 };
+};

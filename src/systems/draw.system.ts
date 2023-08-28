@@ -33,6 +33,8 @@ export class DrawSystem extends System {
         {
           rotate: spriteComponent.rotate,
           flipX: spriteComponent.flipX,
+          transformOriginX: spriteComponent.transformOriginX,
+          transformOriginY: spriteComponent.transformOriginY,
         }
       );
     });

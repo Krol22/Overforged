@@ -1,5 +1,6 @@
 import { AnvilComponent } from '@/components/anvil.component';
 import { DeskComponent } from '@/components/desk.component';
+import { EnemySpawnerComponent } from '@/components/enemySpawner.component';
 import { FunnelComponent } from '@/components/funnel.component';
 import { FurnaceComponent } from '@/components/furnace.component';
 import { InteractionComponent } from '@/components/interaction.component';
@@ -12,7 +13,9 @@ import { SharpenerComponent } from '@/components/sharpener.component';
 import { Item, SpawnerComponent } from '@/components/spawner.component';
 import { SpriteComponent } from '@/components/sprite.component';
 import { anvilTransformerDefinition, furnaceTransformerDefinition, sharpenerTransformerDefinition, TransformerComponent } from '@/components/transformer.component';
+import { controls } from '@/core/controls';
 import { ECS, Entity } from '@/core/ecs';
+import { GameData } from '@/core/gameData';
 import { Renderer } from '@/core/renderer';
 import { State } from '@/core/state';
 import { UI } from '@/core/ui';
@@ -21,14 +24,20 @@ import { ControlsSystem } from '@/systems/controls.system';
 import { DeskSystem } from '@/systems/desk.system';
 import { DrawSystem } from '@/systems/draw.system';
 import { DropzoneSystem } from '@/systems/dropzone.system';
+import { EnemyAISystem } from '@/systems/enemyAI.system';
+import { EnemySpawnSystem } from '@/systems/enemySpawn.system';
+import { FunnelSystem } from '@/systems/funnel.system';
 import { FurnaceSystem } from '@/systems/furnace.system';
 import { FurnaceDropSystem } from '@/systems/furnaceDrop.system';
+import { HealthSystem } from '@/systems/health.system';
+import { HealthBarSystem } from '@/systems/healthBar.system';
 import { ItemSpriteSystem } from '@/systems/itemSprite.system';
 import { OverlapSystem } from '@/systems/overlap.system';
 import { PhysicsSystem } from '@/systems/physics.system';
 import { PickupsSystem } from '@/systems/pickups.system';
 import { SharpenerSystem } from '@/systems/sharpener.system';
 import { SpawnSystem } from '@/systems/spawn.system';
+import { ThrowSystem } from '@/systems/throw.system';
 
 const floorLevel = 170;
 const rightWallX = 290;
@@ -135,7 +144,6 @@ function spawnAnvil(): Entity {
   const positionComponent = new PositionComponent(rightWallX - 98, floorLevel - spriteHeight);
   const spriteComponent = new SpriteComponent(13, 13, 12, spriteHeight);
   const interactionComponent = new InteractionComponent(1, { x: 0, y: 0, w: 12, h: 7 });
-  const itemHolderComponent = new ItemHolderComponent();
   const pickupBlockerComponent = new PickupBlockerComponent();
 
   const funnelComponent = new FunnelComponent([
@@ -155,7 +163,6 @@ function spawnAnvil(): Entity {
     funnelComponent,
     anvilComponent,
     transformerComponent,
-    itemHolderComponent,
     pickupBlockerComponent,
   ]);
 
@@ -206,6 +213,16 @@ function spawnIronBox(): Entity {
   return ironBox;
 }
 
+function spawnEnemySpawner(): Entity {
+  const enemySpawner = new Entity();
+
+  enemySpawner.addComponents([
+    new EnemySpawnerComponent(20),
+  ]);
+
+  return enemySpawner;
+}
+
 function spawnPlayer(): Entity {
   const playerEntity = new Entity();
 
@@ -225,14 +242,16 @@ class GameState implements State {
   private readonly ecs: ECS;
   private readonly renderer: Renderer;
   private readonly ui: UI;
+  private readonly gameData: GameData;
 
   constructor() {
-    this.ecs = new ECS();
+    this.gameData = new GameData();
+    this.ecs = new ECS(this.gameData);
 
     const canvas = document.querySelector('#canvas');
 
     this.renderer = new Renderer(canvas);
-    this.ui = new UI(this.renderer);
+    this.ui = new UI(this.renderer, this.gameData);
   }
 
   onEnter() {
@@ -243,6 +262,7 @@ class GameState implements State {
     const ironBoxEntity = spawnIronBox();
     const sharpenerEntity = spawnSharpener();
     const deskEntity = spawnDesk();
+    const enemySpawnerEntity = spawnEnemySpawner();
 
     this.ecs.addEntities([
       furnaceEntity,
@@ -252,6 +272,8 @@ class GameState implements State {
 
       sharpenerEntity,
       deskEntity,
+
+      enemySpawnerEntity,
 
       playerEntity,
     ]);
@@ -264,15 +286,23 @@ class GameState implements State {
     const dropzoneSystem = new DropzoneSystem(playerEntity, this.ui);
     const furnaceDropSystem = new FurnaceDropSystem(playerEntity, this.ui);
     const spawnSystem = new SpawnSystem(playerEntity, this.ui);
-    const anvilSystem = new AnvilSystem(this.renderer, this.ui);
+    const anvilSystem = new AnvilSystem(playerEntity, this.renderer, this.ui);
     const sharpenerSystem = new SharpenerSystem(playerEntity, this.renderer, this.ui);
     const deskSystem = new DeskSystem(playerEntity);
     const physicsSystem = new PhysicsSystem();
     const itemSpriteSystem = new ItemSpriteSystem();
+    const throwSystem = new ThrowSystem(this.ui);
+    const funnelSystem = new FunnelSystem(playerEntity);
+    const healthSystem = new HealthSystem();
+    const healthBarSystem = new HealthBarSystem(this.renderer);
+
+    const enemySpawnerSystem = new EnemySpawnSystem();
+    const enemyAISystem = new EnemyAISystem();
 
     this.ecs.addSystems([
       controlsSystem,
 
+      funnelSystem,
       dropzoneSystem,
       overlapSystem,
       furnaceSystem,
@@ -282,10 +312,16 @@ class GameState implements State {
       deskSystem,
       pickupsSystem,
       itemSpriteSystem,
+      throwSystem,
 
       physicsSystem,
       drawSystem,
+
+      healthSystem,
       spawnSystem,
+      enemySpawnerSystem,
+      enemyAISystem,
+      healthBarSystem,
     ]);
 
     this.ecs.start(); 
@@ -295,12 +331,23 @@ class GameState implements State {
     this.renderer.clear();
     this.ui.clear();
 
-    this.ecs.update(dt);
-    this.renderer.drawOrnaments();
-    this.renderer.drawCelling();
-    this.renderer.drawSplitWall();
-    this.renderer.drawRightWall();
-    this.renderer.drawFloor();
+    if (!this.gameData.isPaused) {
+      this.ecs.update(dt);
+      this.renderer.drawOrnaments();
+      this.renderer.drawCelling();
+      this.renderer.drawSplitWall();
+      this.renderer.drawRightWall();
+      this.renderer.drawFloor();
+    }
+
+    if (this.gameData.isPaused) {
+      // #TODO tests
+      if (controls.isConfirm && !controls.previousState.isConfirm) {
+        console.log("??");
+        this.gameData.startNextDay();
+      }
+    }
+
     this.ui.draw();
   }
 }

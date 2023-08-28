@@ -7,6 +7,7 @@ export const LETTER_HEIGHT = 6;
 
 type FontOptions = {
   size?: number;
+  centered?: boolean;
 }
 
 type RectOptions = {
@@ -18,6 +19,8 @@ type RectOptions = {
 type SpriteOptions = {
   rotate?: number;
   flipX?: number;
+  transformOriginX?: number;
+  transformOriginY?: number;
 }
 
 export class Renderer {
@@ -56,8 +59,10 @@ export class Renderer {
     this.context.fillRect(x, y, w, h);
   }
 
-  drawSprite(sx: number, sy: number, sw: number, sh: number, dx: number, dy: number, dw: number, dh: number, options?: SpriteOptions) {
+  drawSprite(sx: number, sy: number, sw: number, sh: number, dx: number, dy: number, dw: number, dh: number, options: SpriteOptions = {}) {
     this.context.save();
+
+    const { transformOriginX = 0, transformOriginY = 0 } = options;
 
     this.context.translate(Math.floor(dx) + Math.floor(dw / 2), Math.floor(dy) + Math.floor(dh / 2));
 
@@ -72,7 +77,7 @@ export class Renderer {
 
     this.context.drawImage(
       this.spriteImage,
-      sx, sy, sw, sh, -Math.floor(dw / 2), -Math.floor(dh / 2), dw, dh,
+      sx, sy, sw, sh, -Math.floor(dw / 2) + transformOriginX, -Math.floor(dh / 2) + transformOriginY, dw, dh,
     );
 
     this.context.restore();
@@ -80,6 +85,7 @@ export class Renderer {
 
   drawText(text: string, x: number, y: number, options: FontOptions) {
     const letters = text.split('');
+    let centeredOffset = Math.floor(options.centered ? - text.length * LETTER_WIDTH / 2 : 0);
     
     for (let i = 0; i < letters.length; i++) {
       const letter = letters[i];
@@ -93,13 +99,18 @@ export class Renderer {
       const transformedWidth = LETTER_WIDTH * fontSize;
       const transformedHeight = LETTER_HEIGHT * fontSize;
 
+      let offsetX = 0;
+      if (letter === 'i') {
+        offsetX = 2;
+      }
+
       this.context.drawImage(
         this.fontImage,
         letterX * LETTER_WIDTH,
         letterY * LETTER_HEIGHT,
         LETTER_WIDTH,
         LETTER_HEIGHT,
-        x + i * transformedWidth,
+        x + i * transformedWidth + offsetX + centeredOffset,
         y,
         transformedWidth,
         transformedHeight,

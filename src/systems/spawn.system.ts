@@ -42,11 +42,11 @@ function spawnSteel(): Entity {
   const positionComponent = new PositionComponent(Math.random() * 50, 170 - spriteHeight);
   const spriteComponent = new SpriteComponent(25, 8, 7, spriteHeight);
   const interactionComponent = new InteractionComponent(2, { x: 0, y: 0, w: 2, h: 8 });
-  const pickableComponent = new PickableComponent(Item.steel);
+  const pickableComponent = new PickableComponent(Item.hotSteel);
   const steelComponent = new SteelComponent();
   const physicsComponent = new PhysicsComponent();
-  physicsComponent.affectedByGravity = true;
 
+  physicsComponent.affectedByGravity = true;
   pickableComponent.isPicked = true;
 
   steel.addComponents([

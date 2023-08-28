@@ -3,12 +3,10 @@ import { FunnelComponent } from '@/components/funnel.component';
 import { FurnaceComponent } from '@/components/furnace.component';
 import { ItemHolderComponent } from '@/components/itemHolder.component';
 import { PositionComponent } from '@/components/position.component';
-import { SpriteComponent } from '@/components/sprite.component';
 import { MaxHeatLevel, SteelComponent } from '@/components/steel.component';
 import { System } from '@/core/ecs';
 import { Renderer } from '@/core/renderer';
 
-const FuelEfficency = 100;
 const MaxTemperature = 100;
 
 export class FurnaceSystem extends System {
@@ -39,7 +37,7 @@ export class FurnaceSystem extends System {
 
       if (furnaceComponent.fuel > 0 && furnaceComponent.fuelCounter === 0) {
         furnaceComponent.fuel -= 1;
-        furnaceComponent.fuelCounter = FuelEfficency;
+        furnaceComponent.fuelCounter = this.gameData.fuelEfficency;
       }
 
       if (furnaceComponent.fuelCounter > 0) {
@@ -52,7 +50,7 @@ export class FurnaceSystem extends System {
       }
 
       if (furnaceComponent.fuel === 0 && furnaceComponent.fuelCounter === 0) {
-        furnaceComponent.temperature -= 0.1;
+        furnaceComponent.temperature -= this.gameData.furnaceTemperatureFactor;
 
         if (furnaceComponent.temperature <= 0) {
           furnaceComponent.temperature = 0;
@@ -92,18 +90,21 @@ export class FurnaceSystem extends System {
         15,
       );
 
-      let heatLevel = furnaceComponent.temperature / 34;
+      let heatLevel = Math.floor(furnaceComponent.temperature / 7);
 
-      this.renderer.drawSprite(
-        27,
-        15,
-        5,
-        6,
-        positionComponent.x + 3,
-        positionComponent.y + 14 - heatLevel,
-        5,
-        6,
+      this.renderer.drawRect(
+        positionComponent.x + 17,
+        positionComponent.y - 7,
+        2,
+        13 - heatLevel,
+        {
+          fill: true,
+          color: '#3d453d'
+        }
       );
+
+      heatLevel = furnaceComponent.temperature / 34;
+      this.renderer.drawSprite(27, 15, 5, 6, positionComponent.x + 3, positionComponent.y + 14 - heatLevel, 5, 6);
 
       // const spriteComponent = entity.getComponent<SpriteComponent>(ComponentTypes.Sprite);
       if (itemHolderComponent.hasItemOn) {

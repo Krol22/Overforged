@@ -18,6 +18,10 @@ export class ItemSpriteSystem extends System {
       const pickableComponent = entity.getComponent<PickableComponent>(ComponentTypes.Pickable);
 
       switch(pickableComponent.item) {
+        case Item.coal:
+          spriteComponent.transformOriginX = -7;
+          break;
+
         case Item.tool:
         case Item.tool1:
         case Item.tool2:
@@ -27,6 +31,8 @@ export class ItemSpriteSystem extends System {
           spriteComponent.sh = 8;
           spriteComponent.dw = 8;
           spriteComponent.dh = 8;
+
+          spriteComponent.transformOriginX = 7;
 
           break;
         case Item.weapon:
@@ -40,6 +46,8 @@ export class ItemSpriteSystem extends System {
           spriteComponent.sh = 10;
           spriteComponent.dw = 10;
           spriteComponent.dh = 10;
+
+          spriteComponent.transformOriginX = 7;
           
           break;
         case Item.hotSteel:
@@ -49,6 +57,8 @@ export class ItemSpriteSystem extends System {
           spriteComponent.sh = 7;
           spriteComponent.dw = 7;
           spriteComponent.dh = 7;
+
+          spriteComponent.transformOriginX = 4;
 
           break;
         case Item.horseShoe:

@@ -10,6 +10,9 @@ export class SpriteComponent extends Component {
   public dw: number = 0;
   public dh: number = 0;
 
+  public transformOriginX = 0;
+  public transformOriginY = 0;
+
   public rotateDir: number = -1;
 
   public rotate: number = 0;

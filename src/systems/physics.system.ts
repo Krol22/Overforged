@@ -13,7 +13,6 @@ export class PhysicsSystem extends System {
     super([
       ComponentTypes.Position,
       ComponentTypes.Physics,
-      ComponentTypes.Pickable,
     ]);
   }
 
@@ -21,19 +20,27 @@ export class PhysicsSystem extends System {
     this.systemEntities.forEach((entity) => {
       const positionComponent = entity.getComponent<PositionComponent>(ComponentTypes.Position);
       const physicsComponent = entity.getComponent<PhysicsComponent>(ComponentTypes.Physics);
-      const pickableComponent = entity.getComponent<PickableComponent>(ComponentTypes.Pickable);
 
-      if (!physicsComponent.affectedByGravity || pickableComponent.isPicked) {
+      if (entity.hasEvery([ComponentTypes.Player])) {
         return;
       }
 
-      if (positionComponent.y >= floorLevel - 12) {
+      if (entity.hasEvery([ComponentTypes.Pickable])) {
+        const pickableComponent = entity.getComponent<PickableComponent>(ComponentTypes.Pickable);
+        if (pickableComponent.isPicked) {
+          return;
+        }
+      }
+
+      if (positionComponent.y >= floorLevel - 4) {
         physicsComponent.vy = 0;
         physicsComponent.ay = 0;
         return;
       }
 
-      physicsComponent.ay += gravity;
+      if (physicsComponent.affectedByGravity) {
+        physicsComponent.ay += gravity;
+      }
 
       physicsComponent.vx += physicsComponent.ax;
       physicsComponent.vy += physicsComponent.ay;
@@ -42,7 +49,7 @@ export class PhysicsSystem extends System {
       positionComponent.y += physicsComponent.vy;
 
       if (physicsComponent.vx !== 0) { 
-        physicsComponent.vx *= DAMP;
+        // physicsComponent.vx *= DAMP;
         physicsComponent.ax *= DAMP;
       }
     });

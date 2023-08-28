@@ -30,8 +30,8 @@ class Controls {
     this.previousState.isEscape = this.isEscape;
     this.previousState.isX = this.isX;
 
-    const leftVal = (this.keyMap.get('KeyA') || this.keyMap.get('ArrowLeft')) ? -1 : 0;
-    const rightVal = (this.keyMap.get('KeyD') || this.keyMap.get('ArrowRight')) ? 1 : 0;
+    const leftVal = (this.keyMap.get('KeyA') || this.keyMap.get('ArrowLeft') || this.keyMap.get('KeyH')) ? -1 : 0;
+    const rightVal = (this.keyMap.get('KeyD') || this.keyMap.get('ArrowRight') || this.keyMap.get('KeyL')) ? 1 : 0;
     const upVal = (this.keyMap.get('KeyW') || this.keyMap.get('ArrowUp')) ? -1 : 0;
     const downVal = (this.keyMap.get('KeyS') || this.keyMap.get('ArrowDown')) ? 1 : 0;
     this.inputDirection.x = (leftVal + rightVal);

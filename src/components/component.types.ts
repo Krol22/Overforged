@@ -16,4 +16,9 @@ export enum ComponentTypes {
   Steel,
   Transformer,
   Sharpener,
+  Throw,
+  Health,
+  Enemy,
+  EnemyInteraction,
+  EnemySpawner,
 }
