@@ -1,0 +1,71 @@
+import { Item } from '@/components/spawner.component';
+import { SpriteComponent } from '@/components/sprite.component';
+
+export function setSpriteCoords(item: Item, spriteComponent: SpriteComponent): void {
+
+  switch(item) {
+    case Item.coal:
+      spriteComponent.transformOriginX = -7;
+      break;
+
+    case Item.tool:
+    case Item.tool1:
+    case Item.tool2:
+      spriteComponent.sx = 0;
+      spriteComponent.sy = 28;
+      spriteComponent.sw = 8;
+      spriteComponent.sh = 8;
+      spriteComponent.dw = 8;
+      spriteComponent.dh = 8;
+
+      spriteComponent.transformOriginX = 7;
+
+      break;
+    case Item.weapon:
+    case Item.weapon1:
+    case Item.weapon2:
+    case Item.weapon3:
+    case Item.weapon4:
+      spriteComponent.sx = 0;
+      spriteComponent.sy = 36;
+      spriteComponent.sw = 10;
+      spriteComponent.sh = 10;
+      spriteComponent.dw = 10;
+      spriteComponent.dh = 10;
+
+      spriteComponent.transformOriginX = 7;
+      
+      break;
+    case Item.hotSteel:
+      spriteComponent.sx = 27;
+      spriteComponent.sy = 0;
+      spriteComponent.sw = 7;
+      spriteComponent.sh = 7;
+      spriteComponent.dw = 7;
+      spriteComponent.dh = 7;
+
+      spriteComponent.transformOriginX = 4;
+
+      break;
+    case Item.steel:
+      spriteComponent.sx = 25;
+      spriteComponent.sy = 8;
+      spriteComponent.sw = 7;
+      spriteComponent.sh = 7;
+      spriteComponent.dw = 7;
+      spriteComponent.dh = 7;
+
+      spriteComponent.transformOriginX = 4;
+
+      break;
+    case Item.horseShoe:
+      spriteComponent.sx = 20;
+      spriteComponent.sy = 2;
+      spriteComponent.sw = 7;
+      spriteComponent.sh = 6;
+      spriteComponent.dw = 7;
+      spriteComponent.dh = 6;
+
+      break;
+  }
+}

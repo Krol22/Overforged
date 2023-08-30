@@ -7,6 +7,7 @@ import { PositionComponent } from '@/components/position.component';
 import { Item, SpawnerComponent } from '@/components/spawner.component';
 import { SpriteComponent } from '@/components/sprite.component';
 import { SteelComponent } from '@/components/steel.component';
+import { FloorLevel } from '@/consts';
 import { controls } from '@/core/controls';
 import { Entity, System } from '@/core/ecs';
 import { UI } from '@/core/ui';
@@ -16,7 +17,7 @@ function spawnCoal(): Entity {
 
   const spriteHeight = 5;
 
-  const positionComponent = new PositionComponent(Math.random() * 50, 170 - spriteHeight);
+  const positionComponent = new PositionComponent(Math.random() * 50, FloorLevel - spriteHeight);
   const spriteComponent = new SpriteComponent(18, 8, 6, spriteHeight);
   const interactionComponent = new InteractionComponent(2, { x: 0, y: 0, w: 8, h: 4 });
   const pickableComponent = new PickableComponent(Item.coal, true);
@@ -39,10 +40,10 @@ function spawnSteel(): Entity {
   const steel = new Entity();
 
   const spriteHeight = 7;
-  const positionComponent = new PositionComponent(Math.random() * 50, 170 - spriteHeight);
+  const positionComponent = new PositionComponent(Math.random() * 50, FloorLevel - spriteHeight);
   const spriteComponent = new SpriteComponent(25, 8, 7, spriteHeight);
   const interactionComponent = new InteractionComponent(2, { x: 0, y: 0, w: 2, h: 8 });
-  const pickableComponent = new PickableComponent(Item.hotSteel);
+  const pickableComponent = new PickableComponent(Item.steel);
   const steelComponent = new SteelComponent();
   const physicsComponent = new PhysicsComponent();
 

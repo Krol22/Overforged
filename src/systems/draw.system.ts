@@ -21,6 +21,20 @@ export class DrawSystem extends System {
         return;
       }
 
+      if (spriteComponent.color) {
+        this.renderer.drawRect(
+          positionComponent.x,
+          positionComponent.y,
+          spriteComponent.dw,
+          spriteComponent.dh,
+          {
+            color: spriteComponent.color,
+          },
+        );
+
+        return;
+      }
+
       this.renderer.drawSprite(
         spriteComponent.sx,
         spriteComponent.sy,

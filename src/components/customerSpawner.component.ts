@@ -1,16 +1,16 @@
 import { Component } from '@/core/ecs';
 import { ComponentTypes } from './component.types';
 
-export class EnemySpawnerComponent extends Component {
+export class CustomerSpawnerComponent extends Component {
   public maxSpawnerTime: number;
 
   public currentTime: number;
 
   constructor(maxSpawnerTime: number) {
-    super(ComponentTypes.EnemySpawner);
+    super(ComponentTypes.CustomerSpawner);
 
     this.maxSpawnerTime = maxSpawnerTime;
-    this.currentTime = maxSpawnerTime;
+    this.currentTime = 20; // spawn almost immediately
   }
 
   count() {
@@ -18,7 +18,7 @@ export class EnemySpawnerComponent extends Component {
   }
 
   restart() {
-    const randomSpawnerTime = Math.random() * (this.maxSpawnerTime - 0.5) + 0.5;
+    const randomSpawnerTime = Math.random() * (this.maxSpawnerTime - 2) + 2;
     this.currentTime = randomSpawnerTime;
   }
 }

@@ -2,9 +2,9 @@ import { ComponentTypes } from '@/components/component.types';
 import { PhysicsComponent } from '@/components/physics.component';
 import { PickableComponent } from '@/components/pickable.component';
 import { PositionComponent } from '@/components/position.component';
+import { FloorLevel } from '@/consts';
 import { System } from '@/core/ecs';
 
-const floorLevel = 170;
 const gravity = 0.2;
 const DAMP = 0.85;
 
@@ -32,7 +32,7 @@ export class PhysicsSystem extends System {
         }
       }
 
-      if (positionComponent.y >= floorLevel - 4) {
+      if (positionComponent.y >= FloorLevel - 4) {
         physicsComponent.vy = 0;
         physicsComponent.ay = 0;
         return;

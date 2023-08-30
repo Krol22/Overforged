@@ -41,6 +41,8 @@ export class ControlsSystem extends System {
       if (item) {
         const pickableComponent = item.getComponent<PickableComponent>(ComponentTypes.Pickable);
 
+        console.log(pickableComponent.item);
+
         playerComponent.hadItemPicked = true;
         playerComponent.previousPickedItem = item.id;
       }
@@ -100,8 +102,8 @@ export class ControlsSystem extends System {
 
     positionComponent.x += physicsComponent.vx;
 
-    if (positionComponent.x < 129) {
-      positionComponent.x = 129;
+    if (positionComponent.x < 139) {
+      positionComponent.x = 139;
     }
 
     if (positionComponent.x >= 288) {

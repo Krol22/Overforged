@@ -1,3 +1,5 @@
+import { Item } from '@/components/spawner.component';
+import { CellingY, RightWallX } from '@/consts';
 import { GameData } from './gameData';
 import { LETTER_WIDTH, Renderer } from './renderer';
 
@@ -15,6 +17,8 @@ export class UI {
   private anvilMenuX: number = 196;
   private anvilMenuY: number = 132;
   private drawAnvilMenu?: boolean = false;
+
+  public storedItems: Partial<Record<Item, number>> = {};
 
   private selectedOption: number = 0;
 
@@ -92,14 +96,46 @@ export class UI {
   }
 
   drawGameUI() {
-    this.renderer.drawText(`Coins: ${this.gameData.coins}`, 0, 70, { size: 1 });
-    this.renderer.drawText(`Remaning enemies: ${this.gameData.remaningEnemies}`, 0, 80, { size: 1 });
+    this.drawDayCycleUI();
+  }
+
+  drawDayCycleUI() {
+    const dayCycleUIY = CellingY - 20;
+    const dayCycleUIX = Math.floor(RightWallX / 2) + 33;
+
+    this.renderer.drawSprite(
+      10, 30, 9, 9,
+      dayCycleUIX - 45, dayCycleUIY, 9, 9,
+    );
+
+    this.renderer.drawSprite(
+      19, 30, 8, 9,
+      dayCycleUIX, dayCycleUIY, 8, 9,
+    );
+
+    this.renderer.drawSprite(
+      0, 46, 30, 3,
+      dayCycleUIX - 33, dayCycleUIY + 3, 30, 3,
+    );
+
+    const progress = Math.floor(10 * this.gameData.dailyCustomerSatisfaction / 10);
+
+    this.renderer.drawSprite(
+      36, 8, 3, 4,
+      dayCycleUIX + progress, dayCycleUIY + 7, 3, 4,
+    );
+  }
+
+  drawStoredItems() {
+    Object.entries(this.storedItems).forEach(([item, number], index) => {
+      
+    });
   }
 
   drawBetweenDaysOverlay() {
     this.renderer.drawRect(0, 0, this.renderer.canvasWidth, this.renderer.canvasHeight, { fill: true, color: '#000' });
 
-    this.renderer.drawText(`Congratulations, you survived ${this.gameData.day} days!`, this.renderer.canvasWidth / 2, 20, { size: 1, centered: true });
+    this.renderer.drawText(`Summary of day ${this.gameData.day}: `, this.renderer.canvasWidth / 2, 20, { size: 1, centered: true });
 
     this.renderer.drawText(`You have ${this.gameData.coins} coins to spend:`, this.renderer.canvasWidth / 2 - 100, 45, { size: 1 });
 
@@ -109,6 +145,9 @@ export class UI {
   }
 
   drawGameOverOverlay() {
+  }
+
+  setStoredItems(items: Record<Item, number>) {
   }
 
   clear() {

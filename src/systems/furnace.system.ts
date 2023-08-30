@@ -2,10 +2,14 @@ import { ComponentTypes } from '@/components/component.types';
 import { FunnelComponent } from '@/components/funnel.component';
 import { FurnaceComponent } from '@/components/furnace.component';
 import { ItemHolderComponent } from '@/components/itemHolder.component';
+import { PickableComponent } from '@/components/pickable.component';
 import { PositionComponent } from '@/components/position.component';
+import { SpriteComponent } from '@/components/sprite.component';
 import { MaxHeatLevel, SteelComponent } from '@/components/steel.component';
 import { System } from '@/core/ecs';
 import { Renderer } from '@/core/renderer';
+import { drawTooltipBox } from '@/utils/drawTooltipBox';
+import { setSpriteCoords } from '@/utils/setSpriteCoords';
 
 const MaxTemperature = 100;
 
@@ -59,7 +63,7 @@ export class FurnaceSystem extends System {
 
       // Heating steel
       if (itemHolderComponent.hasItemOn) {
-        const steelEntity = this.allEntities.find((e) => e.id === itemHolderComponent.holdingItemId);
+        const steelEntity = this.getEntity(itemHolderComponent.holdingItemId);
 
         if (steelEntity) {
           const steelComponent = steelEntity.getComponent<SteelComponent>(ComponentTypes.Steel);
@@ -106,15 +110,23 @@ export class FurnaceSystem extends System {
       heatLevel = furnaceComponent.temperature / 34;
       this.renderer.drawSprite(27, 15, 5, 6, positionComponent.x + 3, positionComponent.y + 14 - heatLevel, 5, 6);
 
-      // const spriteComponent = entity.getComponent<SpriteComponent>(ComponentTypes.Sprite);
       if (itemHolderComponent.hasItemOn) {
-        // spriteComponent.color = '#ccc';
-
+        let color = '#ddd';
         if (furnaceComponent.entityHeated) {
-          // spriteComponent.color = '#cc0';
+          color = '#97f3a7';
         }
-      } else {
-        // spriteComponent.color = '#888';
+
+        const spriteComponent = entity.getComponent<SpriteComponent>(ComponentTypes.Sprite);
+        const item = this.getEntity(itemHolderComponent.holdingItemId);
+        const pickableComponent = item.getComponent<PickableComponent>(ComponentTypes.Pickable);
+
+        drawTooltipBox(
+          positionComponent,
+          spriteComponent,
+          pickableComponent.item,
+          color,
+          this.renderer,
+        );
       }
     });
   }

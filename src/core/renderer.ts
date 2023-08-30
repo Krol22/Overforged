@@ -1,6 +1,7 @@
 import font from '../assets/font.png';
 import sprite from '../assets/assets.png';
 import { characters } from './font';
+import { CellingY, FloorLevel } from '@/consts';
 
 export const LETTER_WIDTH = 5;
 export const LETTER_HEIGHT = 6;
@@ -14,6 +15,7 @@ type RectOptions = {
   lineWidth?: number;
   color?: string;
   fill?: boolean;
+  gradient?: CanvasGradient;
 }
 
 type SpriteOptions = {
@@ -30,7 +32,7 @@ export class Renderer {
 
   constructor(canvas: any) {
     this.context = canvas.getContext('2d');
-    this.context.imageSmoothingEnabled = true;
+    this.context.imageSmoothingEnabled = false;
 
     this.fontImage = new Image();
     this.fontImage.src = font;
@@ -51,12 +53,16 @@ export class Renderer {
     this.context.strokeStyle = options.color || "#fff";
     if (!options.fill) {
       this.context.lineWidth = options.lineWidth || 2;
-      this.context.strokeRect(x, y, w, h);
+      this.context.strokeRect(Math.floor(x), Math.floor(y), w, h);
       return;
     }
 
-    this.context.fillStyle = options.color || "#fff";
-    this.context.fillRect(x, y, w, h);
+    if (!options.gradient) {
+      this.context.fillStyle = options.color || "#fff";
+    } else {
+      this.context.fillStyle = options.gradient;
+    }
+    this.context.fillRect(Math.floor(x), Math.floor(y), w, h);
   }
 
   drawSprite(sx: number, sy: number, sw: number, sh: number, dx: number, dy: number, dw: number, dh: number, options: SpriteOptions = {}) {
@@ -118,32 +124,47 @@ export class Renderer {
     }
   }
 
-  drawCelling() {
-    this.drawRect(0, 0, this.canvasWidth, 124, { color: '#000', fill: true });
+  drawEntry() {
+    const gradient = this.context.createLinearGradient(40, 0, 0, 0);
 
-    for (let i = 0; i < 300; i += 5) {
+    // Define gradient stops: right side transparent, left side black
+    gradient.addColorStop(0, "rgba(0, 0, 0, 0)"); // Right: Transparent
+    gradient.addColorStop(0.9, "rgba(0, 0, 0, 1)"); // Left: Black
+
+
+    this.drawRect(
+      0, CellingY, 40, 60,
+      { fill: true, gradient },
+    );
+  }
+
+  drawCelling() {
+    this.drawRect(105, 0, this.canvasWidth, CellingY + 4, { color: '#000', fill: true });
+    this.drawRect(0, 0, this.canvasWidth, CellingY, { color: '#000', fill: true });
+
+    for (let i = 105; i < 300; i += 5) {
       this.context.drawImage(
         this.spriteImage,
-        3, 25, 5, 3, i, 120, 5, 3,
+        3, 25, 5, 3, i, CellingY, 5, 3,
       );
     }
   }
 
   drawFloor() {
-    this.drawRect(0, 170, this.canvasWidth, 600, { color: '#000', fill: true });
+    this.drawRect(0, FloorLevel, this.canvasWidth, 600, { color: '#000', fill: true });
 
     for (let i = 0; i < 302; i += 5) {
       this.context.drawImage(
         this.spriteImage,
-        13, 8, 5, 5, i, 170, 5, 5,
+        13, 8, 5, 5, i, FloorLevel, 5, 5,
       );
     }
   }
 
   drawRightWall() {
-    this.drawRect(299, 100, this.canvasWidth, 500, { color: '#000', fill: true });
+    this.drawRect(299, CellingY, this.canvasWidth, 500, { color: '#000', fill: true });
 
-    for (let i = 120; i < this.canvasHeight; i += 5) {
+    for (let i = CellingY; i < this.canvasHeight; i += 5) {
       this.context.drawImage(
         this.spriteImage,
         8, 8, 5, 5, 300, i, 5, 5,
@@ -152,9 +173,9 @@ export class Renderer {
   }
 
   drawSplitWall() {
-    this.drawRect(158, 124, 5, 26, { color: '#000', fill: true });
+    this.drawRect(158, CellingY + 4, 5, 26, { color: '#000', fill: true });
 
-    for (let i = 124; i < 146; i += 5) {
+    for (let i = CellingY + 4; i < FloorLevel - 24; i += 5) {
       this.drawSprite(
         13, 8, 5, 4, 159, i, 5, 4,
         {
@@ -164,16 +185,48 @@ export class Renderer {
     }
   }
 
-  drawOrnaments() {
-    this.drawSprite(20, 2, 7, 6, 220, 134, 7, 6);
-    this.drawSprite(20, 2, 7, 6, 228, 136, 7, 6);
-    this.drawSprite(20, 2, 7, 6, 234, 132, 7, 6);
+  drawOutsideWall(t: number) {
+    const morning = [215, 232, 253]; // Yellow
+    const noon = [179, 219, 224]; // Blue
 
-    this.drawSprite(0, 36, 10, 10, 274, 128, 10, 10, {
+    const color = [Math.round(lerp(morning[0], noon[0], t / 100)),
+              Math.round(lerp(morning[1], noon[1], t / 100)),
+              Math.round(lerp(morning[2], noon[2], t / 100))];
+
+    const fillColor = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+
+    this.drawRect(0, CellingY, 106, 80, { color: '#000', fill: true });
+
+    this.drawRect(
+      0,
+      CellingY,
+      105,
+      80,
+      { color: fillColor, fill: true },
+    );
+    this.drawRect(105, CellingY + 4, 5, 26, { color: '#000', fill: true });
+
+
+    for (let i = CellingY + 4; i < FloorLevel - 24; i += 5) {
+      this.drawSprite(
+        13, 8, 5, 4, 106, i, 5, 4,
+        {
+          rotate: Math.PI / 2
+        }
+      );
+    }
+  }
+
+  drawOrnaments() {
+    this.drawSprite(20, 2, 7, 6, 220, FloorLevel - 36, 7, 6);
+    this.drawSprite(20, 2, 7, 6, 228, FloorLevel - 34, 7, 6);
+    this.drawSprite(20, 2, 7, 6, 234, FloorLevel - 38, 7, 6);
+
+    this.drawSprite(0, 36, 10, 10, 274, FloorLevel - 42, 10, 10, {
       rotate: Math.PI,
     });
 
-    this.drawSprite(0, 36, 10, 10, 272, 128, 10, 10, {
+    this.drawSprite(0, 36, 10, 10, 272, FloorLevel - 42, 10, 10, {
       rotate: Math.PI / 2,
     });
   }
@@ -182,4 +235,19 @@ export class Renderer {
     this.context.fillStyle = '#3d453d';
     this.context.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
   }
+}
+
+function lerp(start: number, end: number, t: number) {
+  return (1 - t) * start + t * end;
+}
+
+function lerpColor(color1: [number, number, number], color2: [number, number, number], t: number) {
+  const [r1, g1, b1] = color1;
+  const [r2, g2, b2] = color2;
+
+  const r = Math.round(lerp(r1, r2, t));
+  const g = Math.round(lerp(g1, g2, t));
+  const b = Math.round(lerp(b1, b2, t));
+
+  return `rgb(${r}, ${g}, ${b})`;
 }

@@ -15,7 +15,7 @@ export const furnaceTransformerDefinition = {
 };
 
 export const sharpenerTransformerDefinition = {
-  [Item.weapon4]: Item.weapon,
+  [Item.weapon3]: Item.weapon,
   [Item.tool2]: Item.tool,
 };
 

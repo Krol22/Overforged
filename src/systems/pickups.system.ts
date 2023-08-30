@@ -6,6 +6,7 @@ import { PlayerComponent } from '@/components/player.component';
 import { PositionComponent } from '@/components/position.component';
 import { Item } from '@/components/spawner.component';
 import { SpriteComponent } from '@/components/sprite.component';
+import { FloorLevel } from '@/consts';
 import { controls } from '@/core/controls';
 import { Entity, System } from '@/core/ecs';
 import { UI } from '@/core/ui';
@@ -51,7 +52,7 @@ export class PickupsSystem extends System {
             const itemPositionComponent = item.getComponent<PositionComponent>(ComponentTypes.Position);
 
             itemPickableComponent.isPicked = false;
-            itemPositionComponent.y = 170 - 4;
+            itemPositionComponent.y = FloorLevel - 4;
           }
 
           pickableComponent.isPicked = true;
@@ -65,18 +66,8 @@ export class PickupsSystem extends System {
       const spriteComponent = entity.getComponent<SpriteComponent>(ComponentTypes.Sprite);
       const physicsComponent = entity.getComponent<PhysicsComponent>(ComponentTypes.Physics);
 
-      if (controls.isX && !controls.previousState.isX && !entity.hasEvery([ComponentTypes.Throw])) {
+      if (controls.isX && !controls.previousState.isX) {
         physicsComponent.vy = -3;
-        pickableComponent.isPicked = false;
-        playerPlayerComponent.pickedItem = undefined;
-        return;
-      }
-
-      if (controls.isConfirm && !controls.previousState.isConfirm && entity.hasEvery([ComponentTypes.Throw])) {
-        physicsComponent.ax = -0.5;
-        physicsComponent.affectedByGravity = false;
-        positionComponent.y = 170 - 12;
-        playerSpriteComponent.transformFlipX = 1;
         pickableComponent.isPicked = false;
         playerPlayerComponent.pickedItem = undefined;
         return;
@@ -85,7 +76,7 @@ export class PickupsSystem extends System {
       const { x, y } = getPickableOffset(pickableComponent.item);
 
       positionComponent.x = Math.floor(playerPositionComponent.x + spriteComponent.dw / 2) + x;
-      positionComponent.y = 170 + y;
+      positionComponent.y = FloorLevel + y;
       spriteComponent.flipX = playerSpriteComponent.flipX;
     });
   }

@@ -1,6 +1,5 @@
 import { AnvilComponent } from '@/components/anvil.component';
 import { DeskComponent } from '@/components/desk.component';
-import { EnemySpawnerComponent } from '@/components/enemySpawner.component';
 import { FunnelComponent } from '@/components/funnel.component';
 import { FurnaceComponent } from '@/components/furnace.component';
 import { InteractionComponent } from '@/components/interaction.component';
@@ -24,12 +23,10 @@ import { ControlsSystem } from '@/systems/controls.system';
 import { DeskSystem } from '@/systems/desk.system';
 import { DrawSystem } from '@/systems/draw.system';
 import { DropzoneSystem } from '@/systems/dropzone.system';
-import { EnemyAISystem } from '@/systems/enemyAI.system';
-import { EnemySpawnSystem } from '@/systems/enemySpawn.system';
+import { CustomerSpawnSystem } from '@/systems/customerSpawn.system';
 import { FunnelSystem } from '@/systems/funnel.system';
 import { FurnaceSystem } from '@/systems/furnace.system';
 import { FurnaceDropSystem } from '@/systems/furnaceDrop.system';
-import { HealthSystem } from '@/systems/health.system';
 import { HealthBarSystem } from '@/systems/healthBar.system';
 import { ItemSpriteSystem } from '@/systems/itemSprite.system';
 import { OverlapSystem } from '@/systems/overlap.system';
@@ -37,19 +34,20 @@ import { PhysicsSystem } from '@/systems/physics.system';
 import { PickupsSystem } from '@/systems/pickups.system';
 import { SharpenerSystem } from '@/systems/sharpener.system';
 import { SpawnSystem } from '@/systems/spawn.system';
-import { ThrowSystem } from '@/systems/throw.system';
-
-const floorLevel = 170;
-const rightWallX = 290;
+import { CustomerSpawnerComponent } from '@/components/customerSpawner.component';
+import { CustomerTooltipSystem } from '@/systems/customerTooltip.system';
+import { CustomerQueueSystem } from '@/systems/customerQueue.system';
+import { FloorLevel, RightWallX } from '@/consts';
+import { CustomerDespawnSystem } from '@/systems/customerDespawn.system';
 
 function spawnDesk(): Entity {
   const deskEntity = new Entity();
 
   const spriteHeight = 8; 
 
-  const positionComponent = new PositionComponent(rightWallX - 170, floorLevel - spriteHeight);
+  const positionComponent = new PositionComponent(RightWallX - 160, FloorLevel - spriteHeight);
   const spriteComponent = new SpriteComponent(34, 0, 16, spriteHeight);
-  const interactionComponent = new InteractionComponent(1, { x: 0, y: 0, w: 8, h: 24 });
+  const interactionComponent = new InteractionComponent(1, { x: 0, y: 0, w: 12, h: 24 });
   const funnelComponent = new FunnelComponent([
     Item.horseShoe,
     Item.weapon,
@@ -57,7 +55,6 @@ function spawnDesk(): Entity {
   ], 'desk');
   const deskComponent = new DeskComponent();
   const itemHolderComponent = new ItemHolderComponent();
-  const pickupBlockerComponent = new PickupBlockerComponent();
 
   deskEntity.addComponents([
     positionComponent,
@@ -66,7 +63,6 @@ function spawnDesk(): Entity {
     funnelComponent,
     deskComponent,
     itemHolderComponent,
-    pickupBlockerComponent,
   ]);
 
   return deskEntity;
@@ -77,12 +73,12 @@ function spawnSharpener(): Entity {
 
   const spriteHeight = 8;
 
-  const positionComponent = new PositionComponent(rightWallX - 115, floorLevel - spriteHeight);
+  const positionComponent = new PositionComponent(RightWallX - 115, FloorLevel - spriteHeight);
   const spriteComponent = new SpriteComponent(13, 0, 7, spriteHeight);
   const interactionComponent = new InteractionComponent(1, { x: 0, y: 0, w: 7, h: 9 });
   const transformerComponent = new TransformerComponent(sharpenerTransformerDefinition);
   const funnelComponent = new FunnelComponent([
-    Item.weapon4,
+    Item.weapon3,
     Item.tool2,
   ], 'sharpener');
 
@@ -107,7 +103,7 @@ function spawnFurnace(): Entity {
 
   const spriteHeight = 20;
 
-  const positionComponent = new PositionComponent(rightWallX - 45, floorLevel - spriteHeight);
+  const positionComponent = new PositionComponent(RightWallX - 45, FloorLevel - spriteHeight);
   const spriteComponent = new SpriteComponent(0, 0, 13, spriteHeight);
   const interactionComponent = new InteractionComponent(1, { x: 2, y: 2, w: 9, h: 14 });
   const itemHolderComponent = new ItemHolderComponent();
@@ -141,7 +137,7 @@ function spawnAnvil(): Entity {
 
   const spriteHeight = 6;
 
-  const positionComponent = new PositionComponent(rightWallX - 98, floorLevel - spriteHeight);
+  const positionComponent = new PositionComponent(RightWallX - 98, FloorLevel - spriteHeight);
   const spriteComponent = new SpriteComponent(13, 13, 12, spriteHeight);
   const interactionComponent = new InteractionComponent(1, { x: 0, y: 0, w: 12, h: 7 });
   const pickupBlockerComponent = new PickupBlockerComponent();
@@ -149,7 +145,6 @@ function spawnAnvil(): Entity {
   const funnelComponent = new FunnelComponent([
     Item.hotSteel,
     Item.weapon2,
-    Item.weapon3,
     Item.tool1,
   ], 'Anvil');
 
@@ -174,7 +169,7 @@ function spawnCoalpile(): Entity {
 
   const spriteHeight = 7;
 
-  const positionComponent = new PositionComponent(rightWallX - 20, floorLevel - spriteHeight);
+  const positionComponent = new PositionComponent(RightWallX - 20, FloorLevel - spriteHeight);
   const spriteComponent = new SpriteComponent(13, 19, 14, spriteHeight);
   const interactionComponent = new InteractionComponent(1, { x: 0, y: 0, w: 16, h: 16 });
   const spawnerComponent = new SpawnerComponent(Item.coal);
@@ -196,7 +191,7 @@ function spawnIronBox(): Entity {
 
   const spriteHeight = 8;
 
-  const positionComponent = new PositionComponent(rightWallX - 67, floorLevel - spriteHeight);
+  const positionComponent = new PositionComponent(RightWallX - 67, FloorLevel - spriteHeight);
   const spriteComponent = new SpriteComponent(0, 20, 11, spriteHeight);
   const interactionComponent = new InteractionComponent(1, { x: 0, y: 0, w: 16, h: 16 });
   const spawnerComponent = new SpawnerComponent(Item.steel);
@@ -213,14 +208,14 @@ function spawnIronBox(): Entity {
   return ironBox;
 }
 
-function spawnEnemySpawner(): Entity {
-  const enemySpawner = new Entity();
+function spawnCustomerSpawner(): Entity {
+  const customerSpawner = new Entity();
 
-  enemySpawner.addComponents([
-    new EnemySpawnerComponent(20),
+  customerSpawner.addComponents([
+    new CustomerSpawnerComponent(60),
   ]);
 
-  return enemySpawner;
+  return customerSpawner;
 }
 
 function spawnPlayer(): Entity {
@@ -228,7 +223,7 @@ function spawnPlayer(): Entity {
 
   const spriteHeight = 14;
 
-  const positionComponent = new PositionComponent(rightWallX - 145, floorLevel - spriteHeight);
+  const positionComponent = new PositionComponent(RightWallX - 145, FloorLevel - spriteHeight);
   const spriteComponent = new SpriteComponent(32, 26, 12, spriteHeight);
   const playerComponent = new PlayerComponent();
   const physicsComponent = new PhysicsComponent();
@@ -262,7 +257,7 @@ class GameState implements State {
     const ironBoxEntity = spawnIronBox();
     const sharpenerEntity = spawnSharpener();
     const deskEntity = spawnDesk();
-    const enemySpawnerEntity = spawnEnemySpawner();
+    const customerSpawnerEntity = spawnCustomerSpawner();
 
     this.ecs.addEntities([
       furnaceEntity,
@@ -273,7 +268,7 @@ class GameState implements State {
       sharpenerEntity,
       deskEntity,
 
-      enemySpawnerEntity,
+      customerSpawnerEntity,
 
       playerEntity,
     ]);
@@ -288,16 +283,16 @@ class GameState implements State {
     const spawnSystem = new SpawnSystem(playerEntity, this.ui);
     const anvilSystem = new AnvilSystem(playerEntity, this.renderer, this.ui);
     const sharpenerSystem = new SharpenerSystem(playerEntity, this.renderer, this.ui);
-    const deskSystem = new DeskSystem(playerEntity);
+    const deskSystem = new DeskSystem(this.ui);
     const physicsSystem = new PhysicsSystem();
     const itemSpriteSystem = new ItemSpriteSystem();
-    const throwSystem = new ThrowSystem(this.ui);
     const funnelSystem = new FunnelSystem(playerEntity);
-    const healthSystem = new HealthSystem();
     const healthBarSystem = new HealthBarSystem(this.renderer);
+    const customerQueueSystem = new CustomerQueueSystem();
 
-    const enemySpawnerSystem = new EnemySpawnSystem();
-    const enemyAISystem = new EnemyAISystem();
+    const customerSpawnSystem = new CustomerSpawnSystem();
+    const customerDespawnSystem = new CustomerDespawnSystem();
+    const customerTooltipSystem = new CustomerTooltipSystem(this.renderer);
 
     this.ecs.addSystems([
       controlsSystem,
@@ -312,16 +307,16 @@ class GameState implements State {
       deskSystem,
       pickupsSystem,
       itemSpriteSystem,
-      throwSystem,
 
       physicsSystem,
       drawSystem,
 
-      healthSystem,
       spawnSystem,
-      enemySpawnerSystem,
-      enemyAISystem,
+      customerSpawnSystem,
+      customerDespawnSystem,
       healthBarSystem,
+      customerTooltipSystem,
+      customerQueueSystem,
     ]);
 
     this.ecs.start(); 
@@ -332,18 +327,29 @@ class GameState implements State {
     this.ui.clear();
 
     if (!this.gameData.isPaused) {
+      this.renderer.drawCelling();
+
+      const timeOfDay = this.gameData.alreadySpawnedCustomers / this.gameData.customersThisDay * 100; 
+      this.renderer.drawOutsideWall(timeOfDay);
+
       this.ecs.update(dt);
       this.renderer.drawOrnaments();
-      this.renderer.drawCelling();
       this.renderer.drawSplitWall();
       this.renderer.drawRightWall();
       this.renderer.drawFloor();
+      this.renderer.drawEntry();
+
+      if (
+        this.gameData.visibleCustomers === 0 &&
+        this.gameData.customersToSpawn === 0
+      ) {
+        this.gameData.finishDay();
+      }
     }
 
     if (this.gameData.isPaused) {
       // #TODO tests
       if (controls.isConfirm && !controls.previousState.isConfirm) {
-        console.log("??");
         this.gameData.startNextDay();
       }
     }

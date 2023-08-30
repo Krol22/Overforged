@@ -2,12 +2,9 @@ import { AnvilComponent } from '@/components/anvil.component';
 import { ComponentTypes } from '@/components/component.types';
 import { FunnelComponent } from '@/components/funnel.component';
 import { InteractionComponent } from '@/components/interaction.component';
-import { ItemHolderComponent } from '@/components/itemHolder.component';
 import { PickableComponent } from '@/components/pickable.component';
-import { PlayerComponent } from '@/components/player.component';
 import { PositionComponent } from '@/components/position.component';
 import { Item } from '@/components/spawner.component';
-import { ThrowComponent } from '@/components/throw.component';
 import { controls } from '@/core/controls';
 import { Entity, System } from '@/core/ecs';
 import { Renderer } from '@/core/renderer';
@@ -46,8 +43,12 @@ export class AnvilSystem extends System {
 
         if (pickableComponent.item === Item.hotSteel) {
           this.handleForgePlacedItem(entity, anvilItem);
-        }
+          return;
+        } 
 
+        if (controls.isConfirm && !controls.previousState.isConfirm) {
+          this.handleTransformPlacedItem(pickableComponent);
+        }
       }
     });
   }
@@ -62,22 +63,16 @@ export class AnvilSystem extends System {
     if (controls.is1 && !controls.previousState.is1) {
       pickableComponent.item = Item.horseShoe;
       pickableComponent.disposable = true;
-
-      this.addHorseShoeThrowCapabilities(anvilItem);
     } else if (controls.is2 && !controls.previousState.is2) {
-      pickableComponent.item = Item.tool1;
+
+      pickableComponent.item = Item.tool;
+      pickableComponent.disposable = true;
     } else if (controls.is3 && !controls.previousState.is3) {
       pickableComponent.item = Item.weapon1;
     }
   }
 
-  private handleTransformPlacedItem(anvil: Entity, pickableComponent: PickableComponent) {
-    const anvilComponent = anvil.getComponent<AnvilComponent>(ComponentTypes.Anvil);
-
-    if (pickableComponent.item === Item.weapon3) {
-      pickableComponent.item = Item.weapon4;
-    }
-
+  private handleTransformPlacedItem(pickableComponent: PickableComponent) {
     if (pickableComponent.item === Item.weapon2) {
       pickableComponent.item = Item.weapon3;
     }
@@ -85,13 +80,5 @@ export class AnvilSystem extends System {
     if (pickableComponent.item === Item.tool1) {
       pickableComponent.item = Item.tool2;
     }
-  }
-
-  private addHorseShoeThrowCapabilities(horseShoe: Entity) {
-    const throwComponent = new ThrowComponent(1, false); 
-
-    throwComponent.rotationSpeed = 0.1;
-
-    horseShoe.addComponents([throwComponent]);
   }
 }

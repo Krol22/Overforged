@@ -5,7 +5,7 @@ import { System } from '@/core/ecs';
 export class EnemyAISystem extends System {
   constructor() {
     super([
-      ComponentTypes.Enemy,
+      ComponentTypes.Customer,
     ]);
   }
 

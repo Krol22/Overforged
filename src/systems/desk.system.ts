@@ -1,39 +1,63 @@
 import { ComponentTypes } from '@/components/component.types';
+import { DeskComponent } from '@/components/desk.component';
 import { FunnelComponent } from '@/components/funnel.component';
-import { PlayerComponent } from '@/components/player.component';
-import { SpriteComponent } from '@/components/sprite.component';
+import { InteractionComponent } from '@/components/interaction.component';
+import { PickableComponent } from '@/components/pickable.component';
+import { Item } from '@/components/spawner.component';
 import { controls } from '@/core/controls';
-import { Entity, System } from '@/core/ecs';
+import { System } from '@/core/ecs';
+import { UI } from '@/core/ui';
 
 export class DeskSystem extends System {
-  public playerEntity: Entity;
-
-  constructor(playerEntity: Entity) {
+  constructor(
+    private ui: UI,
+  ) {
     super([
       ComponentTypes.Desk,
-      ComponentTypes.ItemHolder,
       ComponentTypes.Funnel,
+      ComponentTypes.Position,
+      ComponentTypes.ItemHolder,
+      ComponentTypes.Interaction,
     ]);
-
-    this.playerEntity = playerEntity;
   }
 
   public update(_dt: number): void {
-    const playerPlayerComponent = this.playerEntity.getComponent<PlayerComponent>(ComponentTypes.Player);
+    const deskEntity = this.systemEntities[0];
 
-    this.systemEntities.forEach((entity) => {
-      const funnelComponent = entity.getComponent<FunnelComponent>(ComponentTypes.Funnel);
+    if (!deskEntity) {
+      return;
+    }
 
-      // if (funnelComponent.canUseEntityId) {
-        // if (controls.isConfirm && !controls.previousState.isConfirm) {
-          // const item = this.getEntity(funnelComponent.canUseEntityId);
+    const deskComponent = deskEntity.getComponent<DeskComponent>(ComponentTypes.Desk);
+    const interactionComponent = deskEntity.getComponent<InteractionComponent>(ComponentTypes.Interaction);
+    const funnelComponent = deskEntity.getComponent<FunnelComponent>(ComponentTypes.Funnel);
 
-          // const spriteComponent = item.getComponent<SpriteComponent>(ComponentTypes.Sprite);
-          // playerPlayerComponent.pickedItem = undefined;
-          // spriteComponent.visible = false;
-          // this.markToRemove(item.id);
-        // }
-      // }
+    const storedItems: Partial<Record<Item, number>> = {};
+
+    deskComponent.storedItems.forEach((item) => {
+      if (!storedItems[item]) {
+        storedItems[item] = 0;
+      }
+
+      storedItems[item] = storedItems[item] as number + 1;
     });
+
+    this.ui.storedItems = storedItems;
+
+    if (!interactionComponent.isOverlaping) {
+      return;
+    }
+
+    if (!funnelComponent.canUseEntityId) {
+      return;
+    }
+
+    if (controls.isConfirm && !controls.previousState.isConfirm) {
+      const droppedItem = this.getEntity(funnelComponent.canUseEntityId);
+      const pickableComponent = droppedItem.getComponent<PickableComponent>(ComponentTypes.Pickable);
+
+      deskComponent.addItem(pickableComponent.item);
+    }
+
   }
 }
