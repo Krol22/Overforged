@@ -65,7 +65,7 @@ export class AnvilSystem extends System {
       pickableComponent.disposable = true;
     } else if (controls.is2 && !controls.previousState.is2) {
 
-      pickableComponent.item = Item.tool;
+      pickableComponent.item = Item.axe1;
       pickableComponent.disposable = true;
     } else if (controls.is3 && !controls.previousState.is3) {
       pickableComponent.item = Item.weapon1;
@@ -75,10 +75,6 @@ export class AnvilSystem extends System {
   private handleTransformPlacedItem(pickableComponent: PickableComponent) {
     if (pickableComponent.item === Item.weapon2) {
       pickableComponent.item = Item.weapon3;
-    }
-
-    if (pickableComponent.item === Item.tool1) {
-      pickableComponent.item = Item.tool2;
     }
   }
 }

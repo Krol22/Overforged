@@ -6,9 +6,9 @@ import { PlayerComponent } from '@/components/player.component';
 import { Entity, System } from '@/core/ecs';
 
 export class FunnelSystem extends System {
-  private playerEntity: Entity;
-
-  constructor(playerEntity: Entity) {
+  constructor(
+    private readonly playerEntity: Entity,
+  ) {
     super([ComponentTypes.Funnel, ComponentTypes.Interaction]);
     
     this.playerEntity = playerEntity;

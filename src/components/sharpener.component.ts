@@ -4,7 +4,7 @@ import { ComponentTypes } from './component.types';
 export const MaxSharpingTime = 100;
 
 export class SharpenerComponent extends Component {
-  public sharpingSpeed = 0.2;
+  public sharpingSpeed = 1;
 
   public sharpenerCount = 0;
 

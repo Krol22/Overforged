@@ -87,14 +87,30 @@ export class SpawnSystem extends System {
       }
 
       const playerPlayerComponent = this.playerEntity.getComponent<PlayerComponent>(ComponentTypes.Player);
+      const spawner = entity.getComponent<SpawnerComponent>(ComponentTypes.Spawner);
 
       if (playerPlayerComponent.hadItemPicked) {
+        // const item = this.getEntity(playerPlayerComponent.previousPickedItem);
+        // const pickableComponent = item.getComponent<PickableComponent>(ComponentTypes.Pickable);
+
+        // if (spawner.itemType !== Item.coal || pickableComponent.item !== Item.steel) {
+          // return;
+        // }
+
+        // this.ui.setActionText(`Pick up the ${spawner.itemType}.`);
+
+        // if (controls.isConfirm && !controls.previousState.isConfirm) {
+          // this.markToRemove(item.id);
+          // const newCoal = spawnCoal();
+          // this.addEntity(newCoal);
+          // playerPlayerComponent.pickedItem = newCoal.id;
+        // }
+
         return;
       }
 
-      const spawner = entity.getComponent<SpawnerComponent>(ComponentTypes.Spawner);
-
-      this.ui.setActionText(`Press <SPACE> to pick up the ${spawner.itemType}`);
+      // If I'm holding steel, and I'm over the coal pile I should drop the coal 
+      this.ui.setActionText(`Pick up the ${spawner.itemType}.`);
 
       if (controls.isConfirm && !controls.previousState.isConfirm) {
         switch (spawner.itemType) {

@@ -39,9 +39,8 @@ export class ControlsSystem extends System {
       });
 
       if (item) {
-        const pickableComponent = item.getComponent<PickableComponent>(ComponentTypes.Pickable);
-
-        console.log(pickableComponent.item);
+        // const pickableComponent = item.getComponent<PickableComponent>(ComponentTypes.Pickable);
+        // console.log(pickableComponent.item);
 
         playerComponent.hadItemPicked = true;
         playerComponent.previousPickedItem = item.id;
@@ -67,24 +66,6 @@ export class ControlsSystem extends System {
 
     if (!playerComponent.hasMoveLocked) {
       this.movePlayer(positionComponent, physicsComponent);
-
-      if (physicsComponent.vx > 0) {
-        spriteComponent.transformFlipX = -1;
-      } else if (physicsComponent.vx < 0) {
-        spriteComponent.transformFlipX = 1;
-      }
-
-      if (physicsComponent.vx !== 0) {
-        spriteComponent.rotate += spriteComponent.rotateDir * 0.025;
-
-        if (spriteComponent.rotate > 0.12) {
-          spriteComponent.rotateDir *= -1;
-        }
-
-        if (spriteComponent.rotate < -0.12) {
-          spriteComponent.rotateDir *= -1;
-        }
-      }
     }
   }
 

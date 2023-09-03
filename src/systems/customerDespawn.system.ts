@@ -7,15 +7,15 @@ import { System } from '@/core/ecs';
 
 const coinValue = {
   [Item.horseShoe]: 1,
-  [Item.tool]: 2,
+  [Item.axe]: 2,
   [Item.weapon]: 4,
 }
 
 const satisfactionFactor = {
   [Item.horseShoe]: 1,
-  [Item.tool]: 1.5,
+  [Item.axe]: 1.5,
   [Item.weapon]: 2.5,
-}
+};
 
 export class CustomerDespawnSystem extends System {
   constructor() {
@@ -28,7 +28,7 @@ export class CustomerDespawnSystem extends System {
       const customerComponent = entity.getComponent<CustomerComponent>(ComponentTypes.Customer);
 
       if (positionComponent.x <= -20 && customerComponent.isLeaving) {
-        const item = customerComponent.wantsToBuy[0] as Item.horseShoe | Item.tool | Item.weapon;
+        const item = customerComponent.wantsToBuy[0] as Item.horseShoe | Item.axe | Item.weapon;
         if (customerComponent.bought) {
           this.gameData.dailyCustomerSatisfaction += HappyCustomerFactor * satisfactionFactor[item];
         } else {

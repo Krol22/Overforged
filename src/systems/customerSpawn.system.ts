@@ -10,8 +10,17 @@ import { Entity, System } from '@/core/ecs';
 
 const chances: Record<number, Item> = {
   50: Item.horseShoe,
-  35: Item.tool,
+  35: Item.axe,
   15: Item.weapon,
+};
+
+const rollSprite = () => {
+  const roll = Math.round(Math.random());
+  if (roll === 0) {
+    return new SpriteComponent(57, 23, 11, 17);
+  }
+
+  return new SpriteComponent(69, 25, 11, 15);
 };
 
 const rollItem = (): Item => {
@@ -32,12 +41,10 @@ const rollItem = (): Item => {
 
 function spawnCustomer(): Entity {
   const customer = new Entity();
-
-  const sprite = new SpriteComponent(0, 0, 5, 8);
-  sprite.color = '#0f0';
+  const sprite = rollSprite();
 
   customer.addComponents([
-    new PositionComponent(-20, FloorLevel - 9),
+    new PositionComponent(-20, FloorLevel - sprite.dh),
     new CustomerComponent([rollItem()]),
     new PhysicsComponent(),
     sprite,

@@ -3,7 +3,9 @@ import { FunnelComponent } from '@/components/funnel.component';
 import { InteractionComponent } from '@/components/interaction.component';
 import { PickableComponent } from '@/components/pickable.component';
 import { PlayerComponent } from '@/components/player.component';
+import { PositionComponent } from '@/components/position.component';
 import { MaxSharpingTime, SharpenerComponent } from '@/components/sharpener.component';
+import { SpriteComponent } from '@/components/sprite.component';
 import { TransformerComponent } from '@/components/transformer.component';
 import { controls } from '@/core/controls';
 import { Entity, System } from '@/core/ecs';
@@ -21,6 +23,7 @@ export class SharpenerSystem extends System {
       ComponentTypes.Interaction,
       ComponentTypes.Sharpener,
       ComponentTypes.Transformer,
+      ComponentTypes.Position,
     ]);
 
     this.playerEntity = playerEntity;
@@ -30,12 +33,17 @@ export class SharpenerSystem extends System {
 
   public update(_dt: number): void {
     const playerPlayerComponent = this.playerEntity.getComponent<PlayerComponent>(ComponentTypes.Player);
+    const playerSpriteComponent = this.playerEntity.getComponent<SpriteComponent>(ComponentTypes.Sprite);
 
     this.systemEntities.forEach((entity) => {
+      const positionComponent = entity.getComponent<PositionComponent>(ComponentTypes.Position);
       const funnelComponent = entity.getComponent<FunnelComponent>(ComponentTypes.Funnel);
       const sharpenerComponent = entity.getComponent<SharpenerComponent>(ComponentTypes.Sharpener);
       const transformerComponent = entity.getComponent<TransformerComponent>(ComponentTypes.Transformer);
       const interactionComponent = entity.getComponent<InteractionComponent>(ComponentTypes.Interaction);
+
+      // playerSpriteComponent.sx = 32;
+      // playerSpriteComponent.sy = 26;
 
       if (!playerPlayerComponent.pickedItem) {
         return;
@@ -54,7 +62,10 @@ export class SharpenerSystem extends System {
 
       if (controls.isConfirm) {
         playerPlayerComponent.hasMoveLocked = true;
-        const hasSharpenItem = this.sharpenItem(sharpenerComponent);
+        // playerSpriteComponent.sx = 48;
+        // playerSpriteComponent.sy = 26;
+
+        const hasSharpenItem = this.sharpenItem(positionComponent, sharpenerComponent);
         if (!hasSharpenItem) {
           return; 
         }
@@ -69,19 +80,33 @@ export class SharpenerSystem extends System {
     });
   }
 
-  private sharpenItem(sharpenerComponent: SharpenerComponent): boolean {
+  private sharpenItem(positionComponent: PositionComponent, sharpenerComponent: SharpenerComponent): boolean {
     sharpenerComponent.sharpenerCount += sharpenerComponent.sharpingSpeed;
     
-    const progress = 80 * sharpenerComponent.sharpenerCount / 100;
+    const progress = 11 * sharpenerComponent.sharpenerCount / MaxSharpingTime;
 
     this.renderer.drawRect(
-      this.renderer.canvasWidth - 20,
-      40 + 80 - progress,
-      20,
+      positionComponent.x,
+      positionComponent.y - 9,
       progress,
-      { color: '#ff0', fill: true },
+      2,
+      {
+        color: '#ddd',
+        lineWidth: 1,
+        fill: true,
+      },
     );
-    this.renderer.drawRect(this.renderer.canvasWidth - 40, 40, 20, 80, { color: '#fff', lineWidth: 2 });
+
+    this.renderer.drawSprite(
+      11,
+      26,
+      13,
+      4,
+      positionComponent.x - 2,
+      positionComponent.y - 10,
+      13,
+      4,
+    );
 
     if (sharpenerComponent.sharpenerCount > MaxSharpingTime) {
       sharpenerComponent.sharpenerCount = 0;

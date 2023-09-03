@@ -5,7 +5,6 @@ import { FurnaceComponent } from '@/components/furnace.component';
 import { InteractionComponent } from '@/components/interaction.component';
 import { ItemHolderComponent } from '@/components/itemHolder.component';
 import { PhysicsComponent } from '@/components/physics.component';
-import { PickupBlockerComponent } from '@/components/pickupBlocker.component';
 import { PlayerComponent } from '@/components/player.component';
 import { PositionComponent } from '@/components/position.component';
 import { SharpenerComponent } from '@/components/sharpener.component';
@@ -39,6 +38,9 @@ import { CustomerTooltipSystem } from '@/systems/customerTooltip.system';
 import { CustomerQueueSystem } from '@/systems/customerQueue.system';
 import { FloorLevel, RightWallX } from '@/consts';
 import { CustomerDespawnSystem } from '@/systems/customerDespawn.system';
+import { FunnelNotifySystem } from '@/systems/funnelNotify.system';
+import { DropzoneActionTextSystem } from '@/systems/dropzoneActionText.system';
+import { MovementAnimationSystem } from '@/systems/movementAnimation.system';
 
 function spawnDesk(): Entity {
   const deskEntity = new Entity();
@@ -47,11 +49,11 @@ function spawnDesk(): Entity {
 
   const positionComponent = new PositionComponent(RightWallX - 160, FloorLevel - spriteHeight);
   const spriteComponent = new SpriteComponent(34, 0, 16, spriteHeight);
-  const interactionComponent = new InteractionComponent(1, { x: 0, y: 0, w: 12, h: 24 });
+  const interactionComponent = new InteractionComponent(1, { x: 0, y: 0, w: 16, h: 12 });
   const funnelComponent = new FunnelComponent([
     Item.horseShoe,
     Item.weapon,
-    Item.tool,
+    Item.axe,
   ], 'desk');
   const deskComponent = new DeskComponent();
   const itemHolderComponent = new ItemHolderComponent();
@@ -79,11 +81,10 @@ function spawnSharpener(): Entity {
   const transformerComponent = new TransformerComponent(sharpenerTransformerDefinition);
   const funnelComponent = new FunnelComponent([
     Item.weapon3,
-    Item.tool2,
+    Item.axe1,
   ], 'sharpener');
 
   const sharpenerComponent = new SharpenerComponent();
-  const pickupBlockerComponent = new PickupBlockerComponent();
 
   sharpenerEntity.addComponents([
     positionComponent,
@@ -92,7 +93,6 @@ function spawnSharpener(): Entity {
     transformerComponent,
     funnelComponent,
     sharpenerComponent,
-    pickupBlockerComponent,
   ]);
 
   return sharpenerEntity;
@@ -107,7 +107,6 @@ function spawnFurnace(): Entity {
   const spriteComponent = new SpriteComponent(0, 0, 13, spriteHeight);
   const interactionComponent = new InteractionComponent(1, { x: 2, y: 2, w: 9, h: 14 });
   const itemHolderComponent = new ItemHolderComponent();
-  const pickupBlockerComponent = new PickupBlockerComponent();
 
   const funnelComponent = new FunnelComponent([
     Item.coal,
@@ -126,7 +125,6 @@ function spawnFurnace(): Entity {
     furnaceComponent,
     transformerComponent,
     itemHolderComponent,
-    pickupBlockerComponent,
   ]);
 
   return furnaceEntity;
@@ -140,12 +138,10 @@ function spawnAnvil(): Entity {
   const positionComponent = new PositionComponent(RightWallX - 98, FloorLevel - spriteHeight);
   const spriteComponent = new SpriteComponent(13, 13, 12, spriteHeight);
   const interactionComponent = new InteractionComponent(1, { x: 0, y: 0, w: 12, h: 7 });
-  const pickupBlockerComponent = new PickupBlockerComponent();
 
   const funnelComponent = new FunnelComponent([
     Item.hotSteel,
     Item.weapon2,
-    Item.tool1,
   ], 'Anvil');
 
   const anvilComponent = new AnvilComponent();
@@ -158,7 +154,6 @@ function spawnAnvil(): Entity {
     funnelComponent,
     anvilComponent,
     transformerComponent,
-    pickupBlockerComponent,
   ]);
 
   return anvilEntity;
@@ -169,18 +164,16 @@ function spawnCoalpile(): Entity {
 
   const spriteHeight = 7;
 
-  const positionComponent = new PositionComponent(RightWallX - 20, FloorLevel - spriteHeight);
+  const positionComponent = new PositionComponent(RightWallX - 15, FloorLevel - spriteHeight);
   const spriteComponent = new SpriteComponent(13, 19, 14, spriteHeight);
-  const interactionComponent = new InteractionComponent(1, { x: 0, y: 0, w: 16, h: 16 });
+  const interactionComponent = new InteractionComponent(1, { x: -1, y: 0, w: 16, h: 16 });
   const spawnerComponent = new SpawnerComponent(Item.coal);
-  const pickupBlockerComponent = new PickupBlockerComponent();
 
   coalpile.addComponents([
     positionComponent,
     spriteComponent,
     interactionComponent,
     spawnerComponent,
-    pickupBlockerComponent,
   ]);
 
   return coalpile;
@@ -193,16 +186,14 @@ function spawnIronBox(): Entity {
 
   const positionComponent = new PositionComponent(RightWallX - 67, FloorLevel - spriteHeight);
   const spriteComponent = new SpriteComponent(0, 20, 11, spriteHeight);
-  const interactionComponent = new InteractionComponent(1, { x: 0, y: 0, w: 16, h: 16 });
+  const interactionComponent = new InteractionComponent(1, { x: 1, y: 0, w: 9, h: 10 });
   const spawnerComponent = new SpawnerComponent(Item.steel);
-  const pickupBlockerComponent = new PickupBlockerComponent();
 
   ironBox.addComponents([
     positionComponent,
     spriteComponent,
     interactionComponent,
     spawnerComponent, 
-    pickupBlockerComponent,
   ]);
 
   return ironBox;
@@ -287,12 +278,16 @@ class GameState implements State {
     const physicsSystem = new PhysicsSystem();
     const itemSpriteSystem = new ItemSpriteSystem();
     const funnelSystem = new FunnelSystem(playerEntity);
+    const funnelNotifySystem = new FunnelNotifySystem(playerEntity, this.renderer);
     const healthBarSystem = new HealthBarSystem(this.renderer);
     const customerQueueSystem = new CustomerQueueSystem();
 
     const customerSpawnSystem = new CustomerSpawnSystem();
     const customerDespawnSystem = new CustomerDespawnSystem();
-    const customerTooltipSystem = new CustomerTooltipSystem(this.renderer);
+    const customerTooltipSystem = new CustomerTooltipSystem(this.renderer, this.ui);
+
+    const dropzoneActionTextSystem = new DropzoneActionTextSystem(playerEntity, this.ui);
+    const movementAnimationSystem = new MovementAnimationSystem();
 
     this.ecs.addSystems([
       controlsSystem,
@@ -317,6 +312,10 @@ class GameState implements State {
       healthBarSystem,
       customerTooltipSystem,
       customerQueueSystem,
+      funnelNotifySystem,
+
+      dropzoneActionTextSystem,
+      movementAnimationSystem,
     ]);
 
     this.ecs.start(); 
@@ -329,14 +328,13 @@ class GameState implements State {
     if (!this.gameData.isPaused) {
       this.renderer.drawCelling();
 
-      const timeOfDay = this.gameData.alreadySpawnedCustomers / this.gameData.customersThisDay * 100; 
-      this.renderer.drawOutsideWall(timeOfDay);
+      this.renderer.drawOutsideWall(50);
+      this.renderer.drawRightWall();
+      this.renderer.drawFloor();
 
       this.ecs.update(dt);
       this.renderer.drawOrnaments();
       this.renderer.drawSplitWall();
-      this.renderer.drawRightWall();
-      this.renderer.drawFloor();
       this.renderer.drawEntry();
 
       if (

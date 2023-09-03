@@ -9,12 +9,11 @@ html, body {
 #canvas {
     transform: scale(2);
     image-rendering: pixelated;
-    border: 1px solid red;
 }
 
 .game {
     position: absolute;
-    top: 40%;
+    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
 }

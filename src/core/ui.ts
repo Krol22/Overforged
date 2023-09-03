@@ -1,5 +1,9 @@
+import { PositionComponent } from '@/components/position.component';
 import { Item } from '@/components/spawner.component';
-import { CellingY, RightWallX } from '@/consts';
+import { SpriteComponent } from '@/components/sprite.component';
+import { CellingY, FloorLevel, RightWallX } from '@/consts';
+import { drawTooltipBox } from '@/utils/drawTooltipBox';
+import { setSpriteCoords } from '@/utils/setSpriteCoords';
 import { GameData } from './gameData';
 import { LETTER_WIDTH, Renderer } from './renderer';
 
@@ -19,6 +23,7 @@ export class UI {
   private drawAnvilMenu?: boolean = false;
 
   public storedItems: Partial<Record<Item, number>> = {};
+  public requiredItems: Array<Item> = [];
 
   private selectedOption: number = 0;
 
@@ -43,8 +48,8 @@ export class UI {
       const textWidth = this.actionText.length * LETTER_WIDTH;
       this.renderer.drawText(
         this.actionText,
-        Math.floor(this.renderer.canvasWidth / 2 - textWidth / 2),
-        this.renderer.canvasHeight - 10,
+        Math.floor(this.renderer.canvasWidth / 4 - textWidth / 2),
+        FloorLevel + 40,
         { size: 1 },
       );
     }
@@ -96,40 +101,77 @@ export class UI {
   }
 
   drawGameUI() {
-    this.drawDayCycleUI();
+    // this.drawDayCycleUI();
+    this.drawStoredItems();
   }
 
-  drawDayCycleUI() {
-    const dayCycleUIY = CellingY - 20;
-    const dayCycleUIX = Math.floor(RightWallX / 2) + 33;
+  getTooltipColor(item: Item) {
+    if (this.requiredItems.includes(item)) {
+      const numberOfItem = this.storedItems[item] ?? 0;
+      const requiredItemsNumber = this.requiredItems.filter((i) => item === i).length;
 
-    this.renderer.drawSprite(
-      10, 30, 9, 9,
-      dayCycleUIX - 45, dayCycleUIY, 9, 9,
-    );
+      if (numberOfItem < requiredItemsNumber) {
+        return '#ac3232';
+      }
 
-    this.renderer.drawSprite(
-      19, 30, 8, 9,
-      dayCycleUIX, dayCycleUIY, 8, 9,
-    );
+      return '#97f3a7';
+    }
 
-    this.renderer.drawSprite(
-      0, 46, 30, 3,
-      dayCycleUIX - 33, dayCycleUIY + 3, 30, 3,
-    );
-
-    const progress = Math.floor(10 * this.gameData.dailyCustomerSatisfaction / 10);
-
-    this.renderer.drawSprite(
-      36, 8, 3, 4,
-      dayCycleUIX + progress, dayCycleUIY + 7, 3, 4,
-    );
+    return '#ddd';
   }
 
   drawStoredItems() {
-    Object.entries(this.storedItems).forEach(([item, number], index) => {
-      
-    });
+    const ox = 100;
+    const oy = CellingY - 30;
+
+    this.renderer.drawText("Stored items:", ox + 10, oy + 8, {});
+
+    const sprite = new SpriteComponent(0, 0, 0, 0);
+    setSpriteCoords(Item.horseShoe, sprite);
+    const position = new PositionComponent(ox + 80, oy + 20);
+    const numberOfHs = this.storedItems[Item.horseShoe] ?? 0;
+
+    drawTooltipBox(
+      position,
+      sprite,
+      Item.horseShoe,
+      this.getTooltipColor(Item.horseShoe),
+      this.renderer,
+    );
+
+    this.renderer.drawText(`:${numberOfHs}`, ox + 93, oy + 8, {});
+
+    setSpriteCoords(Item.axe, sprite);
+    position.x = ox + 115;
+    position.y = oy + 22;
+
+    const numberOfAxe = this.storedItems[Item.axe] ?? 0;
+
+    drawTooltipBox(
+      position,
+      sprite,
+      Item.axe,
+      this.getTooltipColor(Item.axe),
+      this.renderer,
+    );
+
+    this.renderer.drawText(`:${numberOfAxe}`, ox + 131, oy + 8, {});
+
+    setSpriteCoords(Item.weapon, sprite);
+    position.x = ox + 154;
+    position.y = oy + 22;
+
+    const numberOfWeapon = this.storedItems[Item.weapon] ?? 0;
+
+    drawTooltipBox(
+      position,
+      sprite,
+      Item.weapon,
+      this.getTooltipColor(Item.weapon),
+      this.renderer,
+    );
+
+    this.renderer.drawText(`:${numberOfWeapon}`, ox + 171, oy + 8, {});
   }
 
   drawBetweenDaysOverlay() {

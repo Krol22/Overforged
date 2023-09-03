@@ -35,10 +35,6 @@ export class FurnaceSystem extends System {
       const funnelComponent = entity.getComponent<FunnelComponent>(ComponentTypes.Funnel);
       const itemHolderComponent = entity.getComponent<ItemHolderComponent>(ComponentTypes.ItemHolder);
 
-      // Heating furnace itself
-      // console.log(furnaceComponent.fuel);
-      // console.log(furnaceComponent.temperature);
-
       if (furnaceComponent.fuel > 0 && furnaceComponent.fuelCounter === 0) {
         furnaceComponent.fuel -= 1;
         furnaceComponent.fuelCounter = this.gameData.fuelEfficency;
@@ -56,8 +52,8 @@ export class FurnaceSystem extends System {
       if (furnaceComponent.fuel === 0 && furnaceComponent.fuelCounter === 0) {
         furnaceComponent.temperature -= this.gameData.furnaceTemperatureFactor;
 
-        if (furnaceComponent.temperature <= 0) {
-          furnaceComponent.temperature = 0;
+        if (furnaceComponent.temperature <= 25) {
+          furnaceComponent.temperature = 25;
         }
       }
 

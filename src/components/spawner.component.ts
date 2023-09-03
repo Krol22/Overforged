@@ -11,12 +11,11 @@ export enum Item {
   weapon1 = 'weapon1', // from hot-steel to anvil
   weapon2 = 'weapon2', // from anvil to furnace,
   weapon3 = 'weapon3', // from furnace to anvil
-  weapon4 = 'weapon4', // from anvil to anvil,
   weapon = 'weapon', // from anvil to sharpener
 
-  tool1 = 'tool1', // from hot-sceel to anvil
-  tool2 = 'tool2', // from anvil to anvil
-  tool = 'tool', // from anvil to sharpener
+  axe1 = 'axe1', // from hot-sceel to anvil
+  axe2 = 'axe2', // from anvil to anvil
+  axe = 'axe', // from anvil to sharpener
 }
 
 export class SpawnerComponent extends Component {

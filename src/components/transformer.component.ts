@@ -4,9 +4,6 @@ import { Item } from './spawner.component';
 
 export const anvilTransformerDefinition = {
   [Item.weapon2]: Item.weapon3,
-  [Item.weapon3]: Item.weapon4,
-
-  [Item.tool1]: Item.tool2,
 };
 
 export const furnaceTransformerDefinition = {
@@ -16,7 +13,7 @@ export const furnaceTransformerDefinition = {
 
 export const sharpenerTransformerDefinition = {
   [Item.weapon3]: Item.weapon,
-  [Item.tool2]: Item.tool,
+  [Item.axe1]: Item.axe,
 };
 
 export class TransformerComponent extends Component {

@@ -33,6 +33,7 @@ export class Renderer {
   constructor(canvas: any) {
     this.context = canvas.getContext('2d');
     this.context.imageSmoothingEnabled = false;
+    this.context.scale(2, 2);
 
     this.fontImage = new Image();
     this.fontImage.src = font;
@@ -89,6 +90,17 @@ export class Renderer {
     this.context.restore();
   }
 
+  drawParticle() {
+    this.context.save();
+
+    this.context.translate(10, 10);
+
+    this.context.scale(1 / 4, 1 / 4);
+    // this.drawRect(0, 0, 2, 2, { color: '#F00', fill: true });
+
+    this.context.restore();
+  }
+
   drawText(text: string, x: number, y: number, options: FontOptions) {
     const letters = text.split('');
     let centeredOffset = Math.floor(options.centered ? - text.length * LETTER_WIDTH / 2 : 0);
@@ -136,6 +148,8 @@ export class Renderer {
       0, CellingY, 40, 60,
       { fill: true, gradient },
     );
+
+    this.drawParticle();
   }
 
   drawCelling() {

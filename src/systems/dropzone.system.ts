@@ -55,15 +55,17 @@ export class DropzoneSystem extends System {
       const canUseEntity = !!funnelComponent.canUseEntityId;
 
       // TESTING
-      if (canUseEntity) {
-        if (itemHolderComponent.hasItemOn) {
-          this.ui.setActionText('Switch');
-        } else {
-          this.ui.setActionText('Put');
-        }
-      } else if (itemHolderComponent.hasItemOn) {
-        this.ui.setActionText('Take');
-      }
+      // if (canUseEntity) {
+        // const item = this.getEntity(funnelComponent.canUseEntityId);
+        // const pickableComponent = item.getComponent<PickableComponent>(ComponentTypes.Pickable);
+        // if (itemHolderComponent.hasItemOn) {
+          // this.ui.setActionText('Switch');
+        // } else {
+          // this.ui.setActionText(`Put ${pickableComponent.item} in ${funnelComponent.name}`);
+        // }
+      // } else if (itemHolderComponent.hasItemOn) {
+        // this.ui.setActionText('Take');
+      // }
 
       if (controls.isConfirm && !controls.previousState.isConfirm) {
         if (itemHolderComponent.hasItemOn) {

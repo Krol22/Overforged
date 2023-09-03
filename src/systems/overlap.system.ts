@@ -27,6 +27,20 @@ export class OverlapSystem extends System {
     const playerPositionComponent = this.playerEntity.getComponent<PositionComponent>(ComponentTypes.Position);
     const playerSpriteComponent = this.playerEntity.getComponent<SpriteComponent>(ComponentTypes.Sprite);
 
+    if (debug) {
+
+      this.renderer.drawRect(
+        playerPositionComponent.x,
+        playerPositionComponent.y,
+        playerSpriteComponent.dw,
+        playerSpriteComponent.dh,
+        {
+          color: '#ff0',
+          lineWidth: 1,
+        },
+      );
+    }
+
     this.systemEntities.map((entity) => {
       const positionComponent = entity.getComponent<PositionComponent>(ComponentTypes.Position);
       const spriteComponent = entity.getComponent<SpriteComponent>(ComponentTypes.Sprite);
@@ -53,7 +67,7 @@ export class OverlapSystem extends System {
           interactionComponent.box.h,
           {
             color,
-            lineWidth: 2,
+            lineWidth: 1,
           },
         );
       }
