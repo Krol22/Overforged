@@ -5,6 +5,9 @@ import { System } from '@/core/ecs';
 import { Renderer } from '@/core/renderer';
 
 export class DrawSystem extends System {
+  public update(_dt: number): void {
+  }
+
   constructor(public readonly renderer: Renderer) {
     super([
       ComponentTypes.Position,
@@ -12,7 +15,7 @@ export class DrawSystem extends System {
     ]);
   }
 
-  public update(_dt: number): void {
+  public draw(): void {
     this.systemEntities.map((entity) => {
       const positionComponent = entity.getComponent<PositionComponent>(ComponentTypes.Position);
       const spriteComponent = entity.getComponent<SpriteComponent>(ComponentTypes.Sprite);

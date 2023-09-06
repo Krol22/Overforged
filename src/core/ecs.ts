@@ -92,7 +92,7 @@ export abstract class System {
 
 export class ECS {
   private gameData: GameData;
-  private isRunning = false;
+  public isRunning = false;
 
   private entities: Entity[] = [];
   private systems: System[] = [];
@@ -144,11 +144,21 @@ export class ECS {
 
   update(dt: number) {
     if (!this.isRunning) {
+      for (const system of this.systems) {
+        if ((system as any).draw !== null) {
+          (system as any).draw?.();
+        }
+      }
       return;
     }
 
     for (const system of this.systems) {
       system.update(dt);
+
+      if ((system as any).draw !== null) {
+        (system as any).draw?.();
+      }
+
       this.entitiesToRemove.push(
         ...system.markedToRemoveEntities,
       );

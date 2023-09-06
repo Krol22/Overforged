@@ -9,6 +9,8 @@ html, body {
 #canvas {
     transform: scale(2);
     image-rendering: pixelated;
+    border: 8px solid #5C4033;
+    padding: 0px 24px;
 }
 
 .game {

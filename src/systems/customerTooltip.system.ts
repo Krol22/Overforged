@@ -3,6 +3,7 @@ import { CustomerComponent } from '@/components/customer.component';
 import { PositionComponent } from '@/components/position.component';
 import { Item } from '@/components/spawner.component';
 import { SpriteComponent } from '@/components/sprite.component';
+import { CustomerWaitTime } from '@/consts';
 import { System } from '@/core/ecs';
 import { Renderer } from '@/core/renderer';
 import { UI } from '@/core/ui';
@@ -22,6 +23,10 @@ export class CustomerTooltipSystem extends System {
   }
 
   public update(_dt: number): void {
+
+  }
+
+  public draw(_dt: number): void {
     const items = this.systemEntities.map((entity) => {
       const customerComponent = entity.getComponent<CustomerComponent>(ComponentTypes.Customer);  
 
@@ -43,8 +48,6 @@ export class CustomerTooltipSystem extends System {
         return; 
       }
 
-      const x = positionComponent.x + Math.floor(spriteComponent.dw / 2);
-
       const itemToBuy = customerComponent.wantsToBuy[0];
 
       const itemSpriteComponent = new SpriteComponent(0, 0, 0, 0);
@@ -53,26 +56,30 @@ export class CustomerTooltipSystem extends System {
       const neutralColor = [221, 221, 221];
       const angryColor = [172, 50, 50];
 
-      // Box
+      const color = getTransitionColor(neutralColor, angryColor, customerComponent.waits, CustomerWaitTime);
+
       drawTooltipBox(
         positionComponent,
         spriteComponent,
         itemToBuy,
-        '#ddd',
+        `rgb(${color.join(', ')})`,
         this.renderer,
       );
-
-      // Arrow
-      // this.renderer.drawSprite(
-        // 32,
-        // 8,
-        // 4,
-        // 4,
-        // x,
-        // positionComponent.y - spriteComponent.dh + 3, 
-        // 4,
-        // 4,
-      // );
     });
   }
+}
+
+function getTransitionColor(color1: Array<number>, color2: Array<number>, current_time: number, max_time: number) {
+  // Initialize the resulting color as an array with three elements: [R, G, B]
+  let transitionColor = [0, 0, 0];
+
+  // Loop through each color channel (R, G, B)
+  for (let i = 0; i < 3; i++) {
+    // Perform linear interpolation for each color channel
+    transitionColor[i] = Math.floor(
+      color1[i] + (color2[i] - color1[i]) * (current_time / max_time)
+    );
+  }
+
+  return transitionColor;
 }

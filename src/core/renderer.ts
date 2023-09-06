@@ -2,6 +2,7 @@ import font from '../assets/font.png';
 import sprite from '../assets/assets.png';
 import { characters } from './font';
 import { CellingY, FloorLevel } from '@/consts';
+import { controls } from './controls';
 
 export const LETTER_WIDTH = 5;
 export const LETTER_HEIGHT = 6;
@@ -9,6 +10,7 @@ export const LETTER_HEIGHT = 6;
 type FontOptions = {
   size?: number;
   centered?: boolean;
+  opacity?: number;
 }
 
 type RectOptions = {
@@ -25,6 +27,8 @@ type SpriteOptions = {
   transformOriginY?: number;
 }
 
+let scaled = false;
+
 export class Renderer {
   private context: CanvasRenderingContext2D;
   private fontImage: HTMLImageElement;
@@ -33,7 +37,12 @@ export class Renderer {
   constructor(canvas: any) {
     this.context = canvas.getContext('2d');
     this.context.imageSmoothingEnabled = false;
-    this.context.scale(2, 2);
+    
+    if (!scaled) {
+      this.context.scale(2, 2);
+      scaled = true;
+    }
+    controls.registerMouseEvents(canvas);
 
     this.fontImage = new Image();
     this.fontImage.src = font;
@@ -104,6 +113,10 @@ export class Renderer {
   drawText(text: string, x: number, y: number, options: FontOptions) {
     const letters = text.split('');
     let centeredOffset = Math.floor(options.centered ? - text.length * LETTER_WIDTH / 2 : 0);
+
+    if (options.opacity !== undefined) {
+      this.context.globalAlpha = options.opacity;
+    }
     
     for (let i = 0; i < letters.length; i++) {
       const letter = letters[i];
@@ -134,6 +147,8 @@ export class Renderer {
         transformedHeight,
       );
     }
+
+    this.context.globalAlpha = 1;
   }
 
   drawEntry() {

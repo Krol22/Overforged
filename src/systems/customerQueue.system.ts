@@ -67,8 +67,6 @@ export class CustomerQueueSystem extends System {
           deskDeskComponent.removeItem(customerComponent.wantsToBuy[0]);
           customerComponent.bought = true;
           customerComponent.isLeaving = true;
-          this.gameData.coins += 1;
-
           this.gameData.clientsHandled += 1;
         }
       } else {

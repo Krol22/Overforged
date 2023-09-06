@@ -1,3 +1,5 @@
+import { aabb } from '@/utils/aabb';
+
 class Controls {
   isLeft = false;
   isRight = false;
@@ -9,6 +11,11 @@ class Controls {
   isX = false;
   inputDirection: DOMPoint;
 
+  mouseX: number = 0;
+  mouseY: number = 0;
+  isMouse1: boolean = false;
+  isMouse1Pressed: boolean = false;
+
   keyMap: Map<string, boolean> = new Map();
   previousState = {
     is1: this.is1,
@@ -16,7 +23,8 @@ class Controls {
     is3: this.is3,
     isX: this.isX,
     isConfirm: this.isConfirm,
-    isEscape: this.isEscape
+    isEscape: this.isEscape,
+    isMouse1Pressed: this.isMouse1Pressed,
   };
 
   constructor() {
@@ -25,10 +33,58 @@ class Controls {
     this.inputDirection = new DOMPoint();
   }
 
+  registerMouseEvents(canvas: HTMLCanvasElement) {
+    canvas.addEventListener('mousemove', (event) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      this.mouseX = x / 4;
+      this.mouseY = y / 4;
+    });
+
+    canvas.addEventListener('mousedown', (event) => {
+      if (event.button !== 0) {
+        return;
+      }
+
+      this.isMouse1 = true;  
+    });
+
+    canvas.addEventListener('mouseup', (event) => {
+      if (event.button !== 0) {
+        return;
+      }
+
+      this.isMouse1 = false;  
+    });
+  }
+
+  isHovered(x: number, y: number, width: number, height: number): boolean {
+    return aabb(x, y, width, height, this.mouseX, this.mouseY, 1, 1);
+  }
+
+  isDown(x: number, y: number, width: number, height: number): boolean {
+    if (!this.isHovered(x, y, width, height)) {
+      return false;
+    }
+
+    return this.isMouse1Pressed;
+  }
+
+  isPressed(x: number, y: number, width: number, height: number): boolean {
+    if (!this.isHovered(x, y, width, height)) {
+      return false;
+    }
+
+    return this.isMouse1Pressed && !this.previousState.isMouse1Pressed;
+  }
+
   queryController() {
     this.previousState.isConfirm = this.isConfirm;
     this.previousState.isEscape = this.isEscape;
     this.previousState.isX = this.isX;
+    this.previousState.isMouse1Pressed = this.isMouse1Pressed;
 
     const leftVal = (this.keyMap.get('KeyA') || this.keyMap.get('ArrowLeft') || this.keyMap.get('KeyH')) ? -1 : 0;
     const rightVal = (this.keyMap.get('KeyD') || this.keyMap.get('ArrowRight') || this.keyMap.get('KeyL')) ? 1 : 0;
@@ -45,8 +101,9 @@ class Controls {
     this.is1 = Boolean(this.keyMap.get('Digit1'));
     this.is2 = Boolean(this.keyMap.get('Digit2'));
     this.is3 = Boolean(this.keyMap.get('Digit3'));
-
     this.isX = Boolean(this.keyMap.get('KeyX'));
+
+    this.isMouse1Pressed = this.isMouse1;
   }
 
   private toggleKey(event: KeyboardEvent, isPressed: boolean) {

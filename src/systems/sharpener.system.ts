@@ -81,7 +81,7 @@ export class SharpenerSystem extends System {
   }
 
   private sharpenItem(positionComponent: PositionComponent, sharpenerComponent: SharpenerComponent): boolean {
-    sharpenerComponent.sharpenerCount += sharpenerComponent.sharpingSpeed;
+    sharpenerComponent.sharpenerCount += this.gameData.sharpening;
     
     const progress = 11 * sharpenerComponent.sharpenerCount / MaxSharpingTime;
 

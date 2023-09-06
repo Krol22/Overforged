@@ -9,7 +9,7 @@ const coinValue = {
   [Item.horseShoe]: 1,
   [Item.axe]: 2,
   [Item.weapon]: 4,
-}
+};
 
 const satisfactionFactor = {
   [Item.horseShoe]: 1,
@@ -31,6 +31,8 @@ export class CustomerDespawnSystem extends System {
         const item = customerComponent.wantsToBuy[0] as Item.horseShoe | Item.axe | Item.weapon;
         if (customerComponent.bought) {
           this.gameData.dailyCustomerSatisfaction += HappyCustomerFactor * satisfactionFactor[item];
+          this.gameData.totalCoins += coinValue[item];
+          console.log(this.gameData.totalCoins);
         } else {
           this.gameData.dailyCustomerSatisfaction += AngryCustomerFactor;
         }

@@ -28,56 +28,11 @@ export class FurnaceSystem extends System {
     this.renderer = renderer;
   }
 
-  public update(_dt: number): void {
+  public draw(): void {
     this.systemEntities.map((entity) => {
       const positionComponent = entity.getComponent<PositionComponent>(ComponentTypes.Position);
       const furnaceComponent = entity.getComponent<FurnaceComponent>(ComponentTypes.Furnace);
-      const funnelComponent = entity.getComponent<FunnelComponent>(ComponentTypes.Funnel);
       const itemHolderComponent = entity.getComponent<ItemHolderComponent>(ComponentTypes.ItemHolder);
-
-      if (furnaceComponent.fuel > 0 && furnaceComponent.fuelCounter === 0) {
-        furnaceComponent.fuel -= 1;
-        furnaceComponent.fuelCounter = this.gameData.fuelEfficency;
-      }
-
-      if (furnaceComponent.fuelCounter > 0) {
-        furnaceComponent.fuelCounter -= 0.5;
-        furnaceComponent.temperature += 0.1;
-
-        if (furnaceComponent.temperature >= MaxTemperature) {
-          furnaceComponent.temperature = MaxTemperature;
-        }
-      }
-
-      if (furnaceComponent.fuel === 0 && furnaceComponent.fuelCounter === 0) {
-        furnaceComponent.temperature -= this.gameData.furnaceTemperatureFactor;
-
-        if (furnaceComponent.temperature <= 25) {
-          furnaceComponent.temperature = 25;
-        }
-      }
-
-      // Heating steel
-      if (itemHolderComponent.hasItemOn) {
-        const steelEntity = this.getEntity(itemHolderComponent.holdingItemId);
-
-        if (steelEntity) {
-          const steelComponent = steelEntity.getComponent<SteelComponent>(ComponentTypes.Steel);
-
-          if (!steelComponent.isHeated) {
-            steelComponent.heatCounter += furnaceComponent.temperature;
-
-            if (steelComponent.heatCounter >= MaxHeatLevel) {
-              steelComponent.isHeated = true;
-              furnaceComponent.entityHeated = true;
-              funnelComponent.isLocked = false;
-            }
-          }
-        } else {
-          console.error('NO STEEL ENTITY');
-        }
-      }
-
       // Heat level UI
       this.renderer.drawSprite(
         44,
@@ -123,6 +78,57 @@ export class FurnaceSystem extends System {
           color,
           this.renderer,
         );
+      }
+    });
+  }
+
+  public update(_dt: number): void {
+    this.systemEntities.map((entity) => {
+      const furnaceComponent = entity.getComponent<FurnaceComponent>(ComponentTypes.Furnace);
+      const funnelComponent = entity.getComponent<FunnelComponent>(ComponentTypes.Funnel);
+      const itemHolderComponent = entity.getComponent<ItemHolderComponent>(ComponentTypes.ItemHolder);
+
+      if (furnaceComponent.fuel > 0 && furnaceComponent.fuelCounter === 0) {
+        furnaceComponent.fuel -= 1;
+        furnaceComponent.fuelCounter = this.gameData.fuelEfficency;
+      }
+
+      if (furnaceComponent.fuelCounter > 0) {
+        furnaceComponent.fuelCounter -= 0.5;
+        furnaceComponent.temperature += 0.1;
+
+        if (furnaceComponent.temperature >= MaxTemperature) {
+          furnaceComponent.temperature = MaxTemperature;
+        }
+      }
+
+      if (furnaceComponent.fuel === 0 && furnaceComponent.fuelCounter === 0) {
+        furnaceComponent.temperature -= this.gameData.furnaceTemperatureFactor;
+
+        if (furnaceComponent.temperature <= 25) {
+          furnaceComponent.temperature = 25;
+        }
+      }
+
+      // Heating steel
+      if (itemHolderComponent.hasItemOn) {
+        const steelEntity = this.getEntity(itemHolderComponent.holdingItemId);
+
+        if (steelEntity) {
+          const steelComponent = steelEntity.getComponent<SteelComponent>(ComponentTypes.Steel);
+
+          if (!steelComponent.isHeated) {
+            steelComponent.heatCounter += furnaceComponent.temperature;
+
+            if (steelComponent.heatCounter >= MaxHeatLevel) {
+              steelComponent.isHeated = true;
+              furnaceComponent.entityHeated = true;
+              funnelComponent.isLocked = false;
+            }
+          }
+        } else {
+          console.error('NO STEEL ENTITY');
+        }
       }
     });
   }

@@ -11,9 +11,8 @@ import { SharpenerComponent } from '@/components/sharpener.component';
 import { Item, SpawnerComponent } from '@/components/spawner.component';
 import { SpriteComponent } from '@/components/sprite.component';
 import { anvilTransformerDefinition, furnaceTransformerDefinition, sharpenerTransformerDefinition, TransformerComponent } from '@/components/transformer.component';
-import { controls } from '@/core/controls';
 import { ECS, Entity } from '@/core/ecs';
-import { GameData } from '@/core/gameData';
+import { gameData, GameData } from '@/core/gameData';
 import { Renderer } from '@/core/renderer';
 import { State } from '@/core/state';
 import { UI } from '@/core/ui';
@@ -41,6 +40,7 @@ import { CustomerDespawnSystem } from '@/systems/customerDespawn.system';
 import { FunnelNotifySystem } from '@/systems/funnelNotify.system';
 import { DropzoneActionTextSystem } from '@/systems/dropzoneActionText.system';
 import { MovementAnimationSystem } from '@/systems/movementAnimation.system';
+import { ScreenTransition } from '@/core/screen-transition';
 
 function spawnDesk(): Entity {
   const deskEntity = new Entity();
@@ -229,15 +229,18 @@ class GameState implements State {
   private readonly renderer: Renderer;
   private readonly ui: UI;
   private readonly gameData: GameData;
+  private readonly screenTransition: ScreenTransition;
 
   constructor() {
-    this.gameData = new GameData();
+    this.gameData = gameData;
     this.ecs = new ECS(this.gameData);
 
     const canvas = document.querySelector('#canvas');
 
     this.renderer = new Renderer(canvas);
     this.ui = new UI(this.renderer, this.gameData);
+    this.screenTransition = new ScreenTransition(this.renderer);
+
   }
 
   onEnter() {
@@ -318,6 +321,11 @@ class GameState implements State {
       movementAnimationSystem,
     ]);
 
+    this.gameData.isPaused = true;
+    this.screenTransition.startTransition(() => {
+      this.gameData.isPaused = false;
+    }, 50, true);
+
     this.ecs.start(); 
   }
 
@@ -325,34 +333,29 @@ class GameState implements State {
     this.renderer.clear();
     this.ui.clear();
 
-    if (!this.gameData.isPaused) {
-      this.renderer.drawCelling();
+    this.ecs.isRunning = !this.gameData.isPaused;
 
-      this.renderer.drawOutsideWall(50);
-      this.renderer.drawRightWall();
-      this.renderer.drawFloor();
+    this.renderer.drawCelling();
 
-      this.ecs.update(dt);
-      this.renderer.drawOrnaments();
-      this.renderer.drawSplitWall();
-      this.renderer.drawEntry();
+    this.renderer.drawOutsideWall(50);
+    this.renderer.drawRightWall();
+    this.renderer.drawFloor();
 
-      if (
-        this.gameData.visibleCustomers === 0 &&
-        this.gameData.customersToSpawn === 0
-      ) {
-        this.gameData.finishDay();
-      }
-    }
+    this.ecs.update(dt);
 
-    if (this.gameData.isPaused) {
-      // #TODO tests
-      if (controls.isConfirm && !controls.previousState.isConfirm) {
-        this.gameData.startNextDay();
-      }
+    this.renderer.drawOrnaments();
+    this.renderer.drawSplitWall();
+    this.renderer.drawEntry();
+
+    if (
+      this.gameData.visibleCustomers === 0 &&
+      this.gameData.customersToSpawn === 0
+    ) {
+      this.gameData.finishDay();
     }
 
     this.ui.draw();
+    this.screenTransition.update();
   }
 }
 
