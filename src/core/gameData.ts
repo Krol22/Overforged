@@ -3,6 +3,7 @@ import { getUpgradeCost } from '@/utils/getUpgradeCost';
 
 const fuelEfficencyBase = 100;
 const sharpeningBase = 1;
+const furnaceBase = 1;
 
 export class GameData {
   public _isPaused: boolean = false;
@@ -20,7 +21,7 @@ export class GameData {
   public _grindWheelLevel: number = 1;
   public set grindWheelLevel(value: number) {
     this._grindWheelLevel = value;
-    this.sharpening = sharpeningBase + sharpeningBase * this.grindWheelLevel / 2;
+    this.sharpening = sharpeningBase + sharpeningBase * this.grindWheelLevel / 5;
   }
 
   public get grindWheelLevel() {
@@ -36,33 +37,59 @@ export class GameData {
   public get coalLevel() {
     return this._coalLevel;
   }
-  public couch: number = 0;
 
-  public customersToSpawn: number = 5;
+  public _furnaceLevel: number = 1;
+  public set furnaceLevel(value: number) {
+    this._furnaceLevel = value;
+    this.furnaceEfficency = furnaceBase + furnaceBase * this.furnaceLevel / 10;
+  }
+
+  public get furnaceLevel() {
+    return this._furnaceLevel;
+  }
+
+  public bench: number = 0;
+
+  public customersToSpawn: number = 1;
   public customersThisDay: number = this.customersToSpawn;
   public alreadySpawnedCustomers: number = 0;
-  public totalCoins: number = 100;
+  public totalCoins: number = 400;
 
   public maxClientSpawned: number = 2;
   public visibleCustomers: number = 0;
 
   public dailyCustomerSatisfaction: number = 0;
-
-  public happyClientsHandled: number = 0;
   public clientsHandled: number = 0;
-
-  public totalSatisfaction: number = 10;
+  public totalSatisfaction: number = 0;
 
   // Control variables
-  public isDayChangeOverlayVisible: boolean = true;
-  public lastCustomerNotification: boolean = true;
+  public isDayChangeOverlayVisible: boolean = false;
+  public lastCustomerNotification: boolean = false;
+  public goToGameOverScreen: boolean = false;
+  public settingsVisible = false;
 
   // Upgradeable variables
   public fuelEfficency = 100;
   public furnaceTemperatureFactor = 0.1;
   public sharpening = 1;
+  public furnaceEfficency = 1;
 
-  public settingsVisible = false;
+  public newGame() {
+    this.furnaceLevel = 1;
+    this.grindWheelLevel = 1;
+    this.coalLevel = 1;
+    this.bench = 0;
+
+    this.totalCoins = 0;
+    this.totalSatisfaction = 0;
+    this.customersToSpawn = 1;
+    this.maxClientSpawned = 2;
+    this.clientsHandled = 0;
+
+    this.isDayChangeOverlayVisible = false;
+    this.lastCustomerNotification = false;
+    this.goToGameOverScreen = false;
+  }
 
   public showSettings() {
     this.isPaused = true;
@@ -75,14 +102,20 @@ export class GameData {
   }
 
   public finishDay() {
-    this.isPaused = true;
-    this.isDayChangeOverlayVisible = true;
-
     this.totalSatisfaction += this.dailyCustomerSatisfaction;
+    this.dailyCustomerSatisfaction = 0;
+    this.isPaused = true;
     
     if (this.totalSatisfaction >= MaxSatisfaction) {
       this.totalSatisfaction = MaxSatisfaction;
     }
+
+    if (this.totalSatisfaction <= 0) {
+      this.goToGameOverScreen = true;
+      return;
+    }
+
+    this.isDayChangeOverlayVisible = true;
   }
 
   public startNextDay() {

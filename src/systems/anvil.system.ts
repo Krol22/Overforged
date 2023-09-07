@@ -46,6 +46,7 @@ export class AnvilSystem extends System {
           return;
         } 
 
+        this.ui.setActionText('Forge the sword!');
         if (controls.isConfirm && !controls.previousState.isConfirm) {
           this.handleTransformPlacedItem(pickableComponent);
         }

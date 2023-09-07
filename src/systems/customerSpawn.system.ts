@@ -14,13 +14,15 @@ const chances: Record<number, Item> = {
   15: Item.weapon,
 };
 
-const rollSprite = () => {
-  const roll = Math.round(Math.random());
-  if (roll === 0) {
-    return new SpriteComponent(57, 23, 11, 17);
-  }
+const sprites = [
+  () => new SpriteComponent(57, 23, 11, 17),
+  () => new SpriteComponent(69, 25, 11, 15),
+  () => new SpriteComponent(81, 22, 16, 20),
+];
 
-  return new SpriteComponent(69, 25, 11, 15);
+const rollSprite = () => {
+  const index = Math.floor(Math.random() * 3);
+  return sprites[index]();
 };
 
 const rollItem = (): Item => {

@@ -66,7 +66,21 @@ export class ControlsSystem extends System {
 
     if (!playerComponent.hasMoveLocked) {
       this.movePlayer(positionComponent, physicsComponent);
+
+      spriteComponent.sx = 32;
+      spriteComponent.sy = 26;
+      spriteComponent.sw = 12;
+      spriteComponent.sh = 14;
+    } else {
+      physicsComponent.vx = 0;
+      physicsComponent.ax = 0;
+
+      spriteComponent.sx = 45;
+      spriteComponent.sy = 26;
+      spriteComponent.sw = 11;
+      spriteComponent.sh = 14;
     }
+
   }
 
   private movePlayer(positionComponent: PositionComponent, physicsComponent: PhysicsComponent) {

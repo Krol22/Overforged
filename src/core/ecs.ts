@@ -142,22 +142,21 @@ export class ECS {
     }
   }
 
+  draw() {
+    for (const system of this.systems) {
+      if ((system as any).draw !== null) {
+        (system as any).draw?.();
+      }
+    }
+  }
+
   update(dt: number) {
     if (!this.isRunning) {
-      for (const system of this.systems) {
-        if ((system as any).draw !== null) {
-          (system as any).draw?.();
-        }
-      }
       return;
     }
 
     for (const system of this.systems) {
       system.update(dt);
-
-      if ((system as any).draw !== null) {
-        (system as any).draw?.();
-      }
 
       this.entitiesToRemove.push(
         ...system.markedToRemoveEntities,

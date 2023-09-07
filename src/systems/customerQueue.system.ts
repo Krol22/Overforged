@@ -46,6 +46,10 @@ export class CustomerQueueSystem extends System {
       const physicsComponent = entity.getComponent<PhysicsComponent>(ComponentTypes.Physics);
       const spriteComponent = entity.getComponent<SpriteComponent>(ComponentTypes.Sprite);
 
+      if (customerComponent.isLeaving) {
+        return;
+      }
+
       const xPositionsIndex = xPositions.findIndex((e) => e.id === entity.id);
 
       // is not last index
@@ -71,30 +75,6 @@ export class CustomerQueueSystem extends System {
         }
       } else {
         physicsComponent.vx = 0.4;
-      }
-
-      if (physicsComponent.vx === 0) {
-        customerComponent.waits += 0.1;
-      }
-
-      if (physicsComponent.vx > 0) {
-        customerComponent.waits -= 0;
-
-        if (customerComponent.waits <= 0) {
-          customerComponent.waits = 0;
-        }
-      }
-
-      if (customerComponent.waits >= CustomerWaitTime) {
-        customerComponent.isLeaving = true;
-      }
-
-      if (customerComponent.isLeaving) {
-        physicsComponent.vx = -0.8;
-      }
-
-      if (customerComponent.bought) {
-        customerComponent.waits = 0;
       }
     });
   }

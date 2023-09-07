@@ -11,6 +11,7 @@ type FontOptions = {
   size?: number;
   centered?: boolean;
   opacity?: number;
+  color?: any;
 }
 
 type RectOptions = {
@@ -118,6 +119,11 @@ export class Renderer {
       this.context.globalAlpha = options.opacity;
     }
     
+    const offscreenCanvas = document.createElement('canvas');
+    offscreenCanvas.width = LETTER_WIDTH;
+    offscreenCanvas.height = LETTER_HEIGHT;
+    const offscreenCtx = offscreenCanvas.getContext('2d', { willReadFrequently: true });
+    
     for (let i = 0; i < letters.length; i++) {
       const letter = letters[i];
       const characterIndex = characters[letter];
@@ -132,20 +138,63 @@ export class Renderer {
 
       let offsetX = 0;
       if (letter === 'i') {
-        offsetX = 2;
+        offsetX = 1;
       }
 
-      this.context.drawImage(
-        this.fontImage,
-        letterX * LETTER_WIDTH,
-        letterY * LETTER_HEIGHT,
-        LETTER_WIDTH,
-        LETTER_HEIGHT,
-        x + i * transformedWidth + offsetX + centeredOffset,
-        y,
-        transformedWidth,
-        transformedHeight,
-      );
+      if (options.color) {
+        offscreenCtx?.drawImage(
+          this.fontImage,
+          letterX * LETTER_WIDTH,
+          letterY * LETTER_HEIGHT,
+          LETTER_WIDTH,
+          LETTER_HEIGHT,
+          0,
+          0,
+          LETTER_WIDTH,
+          LETTER_HEIGHT,
+        );
+
+        const imageData = offscreenCtx?.getImageData(0, 0, LETTER_WIDTH, LETTER_HEIGHT);
+        const data = imageData?.data as any;
+        const rgb = options.color;
+
+        for (let j = 0; j < data.length; j += 4) {
+          if (data[j + 3] > 0) {  // If pixel is not fully transparent
+            data[j] = rgb.r;
+            data[j + 1] = rgb.g;
+            data[j + 2] = rgb.b;
+          }
+        }
+
+        offscreenCtx?.putImageData(imageData as any, 0, 0);
+
+        // Draw the recolored letter onto the original canvas
+        this.context.drawImage(
+          offscreenCanvas,
+          0,
+          0,
+          LETTER_WIDTH,
+          LETTER_HEIGHT,
+          x + i * transformedWidth + offsetX + centeredOffset,
+          y,
+          transformedWidth,
+          transformedHeight
+        );
+
+        offscreenCtx?.clearRect(0, 0, LETTER_WIDTH, LETTER_HEIGHT);
+      } else {
+        this.context.drawImage(
+          this.fontImage,
+          letterX * LETTER_WIDTH,
+          letterY * LETTER_HEIGHT,
+          LETTER_WIDTH,
+          LETTER_HEIGHT,
+          x + i * transformedWidth + offsetX + centeredOffset,
+          y,
+          transformedWidth,
+          transformedHeight
+        );
+      }
     }
 
     this.context.globalAlpha = 1;
@@ -182,12 +231,21 @@ export class Renderer {
   drawFloor() {
     this.drawRect(0, FloorLevel, this.canvasWidth, 600, { color: '#000', fill: true });
 
-    for (let i = 0; i < 302; i += 5) {
+    for (let i = 103; i < 302; i += 5) {
       this.context.drawImage(
         this.spriteImage,
-        13, 8, 5, 5, i, FloorLevel, 5, 5,
+        13, 8, 5, 5, i + 2, FloorLevel, 5, 5,
       );
     }
+
+    for (let i = 0; i < 103; i += 6) {
+      this.context.drawImage(
+        this.spriteImage,
+        27, 21, 6, 3, i - 3, FloorLevel + 1, 6, 3,
+      );
+    }
+
+    this.drawRect(105, FloorLevel, 1, 600, { color: '#000', fill: true });
   }
 
   drawRightWall() {
@@ -246,23 +304,33 @@ export class Renderer {
     }
   }
 
-  drawOrnaments() {
+  drawOrnaments(drawBench: boolean) {
     this.drawSprite(20, 2, 7, 6, 220, FloorLevel - 36, 7, 6);
     this.drawSprite(20, 2, 7, 6, 228, FloorLevel - 34, 7, 6);
     this.drawSprite(20, 2, 7, 6, 234, FloorLevel - 38, 7, 6);
 
-    this.drawSprite(0, 36, 10, 10, 274, FloorLevel - 42, 10, 10, {
+    this.drawSprite(80, 0, 10, 10, 274, FloorLevel - 42, 10, 10, {
       rotate: Math.PI,
     });
 
-    this.drawSprite(0, 36, 10, 10, 272, FloorLevel - 42, 10, 10, {
+    this.drawSprite(80, 0, 10, 10, 272, FloorLevel - 42, 10, 10, {
       rotate: Math.PI / 2,
     });
+
+    // Door
+    this.drawSprite(90, 0, 14, 21, 105, FloorLevel - 21, 14, 21, {});
+
+    // Bench
+    if (drawBench) {
+      this.drawSprite(68, 10, 22, 11, 75, FloorLevel - 11, 22, 11, {});
+    }
   }
 
   clear() {
     this.context.fillStyle = '#3d453d';
     this.context.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+
+    this.drawRect(160, CellingY, 200, 200, { color: '#232323', fill: true });
   }
 }
 

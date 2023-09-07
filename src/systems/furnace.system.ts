@@ -118,7 +118,7 @@ export class FurnaceSystem extends System {
           const steelComponent = steelEntity.getComponent<SteelComponent>(ComponentTypes.Steel);
 
           if (!steelComponent.isHeated) {
-            steelComponent.heatCounter += furnaceComponent.temperature;
+            steelComponent.heatCounter += furnaceComponent.temperature * this.gameData.furnaceEfficency;
 
             if (steelComponent.heatCounter >= MaxHeatLevel) {
               steelComponent.isHeated = true;

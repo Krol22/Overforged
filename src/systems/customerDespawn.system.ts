@@ -32,7 +32,6 @@ export class CustomerDespawnSystem extends System {
         if (customerComponent.bought) {
           this.gameData.dailyCustomerSatisfaction += HappyCustomerFactor * satisfactionFactor[item];
           this.gameData.totalCoins += coinValue[item];
-          console.log(this.gameData.totalCoins);
         } else {
           this.gameData.dailyCustomerSatisfaction += AngryCustomerFactor;
         }

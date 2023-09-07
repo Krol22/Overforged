@@ -1,10 +1,12 @@
 import { createGameStateMachine, gameStateMachine } from './game-state-machine';
 import { controls } from '@/core/controls';
-import { gameState } from './game-states/game.state';
+import { gameStateFactory } from './game-states/game.state';
 import { menuState } from './game-states/menu.state';
+import { gameOverState } from './game-states/gameOver.state';
 
-createGameStateMachine(gameState);
+// createGameStateMachine(gameStateFactory());
 // createGameStateMachine(menuState);
+createGameStateMachine(gameOverState);
 
 let previousTime = 0;
 const interval = 1000 / 60;

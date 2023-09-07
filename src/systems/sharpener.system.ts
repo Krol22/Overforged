@@ -60,6 +60,10 @@ export class SharpenerSystem extends System {
         return;
       }
 
+      const item = this.getEntity(pickedItem.id);
+      const itemSprite = item.getComponent<SpriteComponent>(ComponentTypes.Sprite);
+      itemSprite.visible = true;
+
       if (controls.isConfirm) {
         playerPlayerComponent.hasMoveLocked = true;
         // playerSpriteComponent.sx = 48;
@@ -67,10 +71,10 @@ export class SharpenerSystem extends System {
 
         const hasSharpenItem = this.sharpenItem(positionComponent, sharpenerComponent);
         if (!hasSharpenItem) {
+          itemSprite.visible = false;
           return; 
         }
 
-        const item = this.getEntity(pickedItem.id);
         this.transformItemAfterSharping(item, transformerComponent);
         playerPlayerComponent.hasMoveLocked = false;
       } else {
@@ -102,7 +106,7 @@ export class SharpenerSystem extends System {
       26,
       13,
       4,
-      positionComponent.x - 2,
+      positionComponent.x - 1,
       positionComponent.y - 10,
       13,
       4,

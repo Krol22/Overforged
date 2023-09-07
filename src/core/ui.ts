@@ -1,18 +1,13 @@
 import { PositionComponent } from '@/components/position.component';
 import { Item } from '@/components/spawner.component';
 import { SpriteComponent } from '@/components/sprite.component';
-import { CellingY, FloorLevel, RightWallX } from '@/consts';
+import { CellingY, FloorLevel } from '@/consts';
 import { drawTooltipBox } from '@/utils/drawTooltipBox';
 import { getUpgradeCost } from '@/utils/getUpgradeCost';
 import { setSpriteCoords } from '@/utils/setSpriteCoords';
 import { controls } from './controls';
 import { GameData } from './gameData';
 import { LETTER_HEIGHT, LETTER_WIDTH, Renderer } from './renderer';
-
-const options = [
-  { text: 'Upgrade forge', costPerLevel: 10 },
-  { text: 'Upgrade coal efficency', costPerLevel: 4 },
-];
 
 enum CustomerSatisfaction {
   WELL_PLEASED = "most pleased",
@@ -23,19 +18,19 @@ enum CustomerSatisfaction {
   INFURIATED = "most infuriated"
 }
 
-function mapRatingToSatisfaction(rating: number): CustomerSatisfaction {
+function mapRatingToSatisfaction(rating: number): [CustomerSatisfaction, any] {
   if (rating <= 1) {
-    return CustomerSatisfaction.INFURIATED;
+    return [CustomerSatisfaction.INFURIATED,{ r: 199, g: 85, b: 85 }];
   } else if (rating <= 3) {
-    return CustomerSatisfaction.ANNOYED;
+    return [CustomerSatisfaction.ANNOYED, { r: 177, g: 102, b: 85 }];
   } else if (rating <= 5) {
-    return CustomerSatisfaction.NEUTRAL;
+    return [CustomerSatisfaction.NEUTRAL, { r: 154, g: 120, b: 86 }];
   } else if (rating <= 7) {
-    return CustomerSatisfaction.GOOD;
+    return [CustomerSatisfaction.GOOD, { r: 130, g: 139, b: 87 }];
   } else if (rating <= 9) {
-    return CustomerSatisfaction.SATISFIED;
+    return [CustomerSatisfaction.SATISFIED, { r: 109, g: 155, b: 87 }];
   } else {
-    return CustomerSatisfaction.WELL_PLEASED;
+    return [CustomerSatisfaction.WELL_PLEASED, { r: 89, g: 170, b: 87 }];
   }
 }
 
@@ -99,19 +94,19 @@ export class UI {
       );
 
       this.renderer.drawSprite(
-        0,
-        28,
-        8,
-        8,
+        58,
+        10,
+        10,
+        9,
         this.anvilMenuX - 2,
         this.anvilMenuY + 5,
-        8,
-        8,
+        10,
+        9,
       );
 
       this.renderer.drawSprite(
+        80,
         0,
-        36,
         10,
         10,
         this.anvilMenuX + 10,
@@ -185,15 +180,13 @@ export class UI {
 
       if (this.notificationOpacity <= 0 && this.notificationOpacityDir !== 0) {
         this.notificationOpacity = 0;
+        console.log(this.gameData.lastCustomerNotification, "?");
         this.gameData.lastCustomerNotification = false;
         this.gameData.finishDay();
       }
 
       this.drawLastClientForToday(this.notificationOpacity);
     }
-    // if (this.gameData.settingsVisible) {
-      // this.drawSettingsModal();
-    // }
   }
 
   drawLastClientForToday(counter: number) {
@@ -298,35 +291,56 @@ export class UI {
 
   drawBetweenDaysOverlay() {
     const ox = 60;
-    const oy = 30;
+    const oy = 20;
 
     const modalW = 200;
-    const modalH = 161;
+    const modalH = 181;
 
-    this.renderer.drawRect(ox - 7, oy - 12, modalW + 4, modalH + 4, { color: '#777', fill: true });
-    this.renderer.drawRect(ox - 5, oy - 10, modalW, modalH, { color: '#3a3a4a', fill: true });
+    this.renderer.drawRect(ox - 7, oy - 12, modalW + 4, modalH + 4, { color: '#3c2013', fill: true });
+    this.renderer.drawRect(ox - 9, oy - 10, modalW + 8, modalH, { color: '#3c2013', fill: true });
+    this.renderer.drawRect(ox - 5, oy - 10, modalW, modalH, { color: '#222', fill: true });
+    this.renderer.drawRect(ox - 7, oy - 8, modalW + 4, modalH - 4, { color: '#222', fill: true });
 
     this.renderer.drawText(`Day ${this.gameData.day} summary: `, ox + 42, oy - 0, { size: 1.5 });
 
     this.renderer.drawText(`You have served ${this.gameData.clientsHandled} villagers`, ox + 4, oy + 17, { size: 1 });
-    this.renderer.drawText(`The Lord is ${mapRatingToSatisfaction(this.gameData.totalSatisfaction)}!`, ox + 4, oy + 27, { size: 1 });
+
+    const [satisfactionText, color] = mapRatingToSatisfaction(this.gameData.totalSatisfaction);
+    this.renderer.drawText(`The Lord is ${satisfactionText}!`, ox + 4, oy + 27, { size: 1, color });
+
     this.renderer.drawText(`Available upgrades: (${this.gameData.totalCoins}c available)`, ox + 4, oy + 37, { size: 1 });
 
-    const upgradeablesOY = -20;
+    const upgradeablesOY = 5;
 
     const {
+      furnaceLevel,
       grindWheelLevel,
       coalLevel,
-      couch,
+      bench: couch,
     } = this.gameData;
 
     const coins = this.gameData.totalCoins;
+
+    // Furnace
+    const furnaceUpgradeCost = getUpgradeCost(20, furnaceLevel);
+    const canUpgradeFurnace = coins >= furnaceUpgradeCost;
+
+    // Furnace
+    this.renderer.drawSprite(27, 15, 5, 6, ox + 3, oy + 57 + upgradeablesOY, 5, 6);
+    this.renderer.drawSprite(0, 0, 13, 20, ox + 0, oy + 45 + upgradeablesOY, 13, 20);
+    this.drawButton(`Buy level ${furnaceLevel + 1} (${furnaceUpgradeCost}c)`, ox + 20, oy + 49 + upgradeablesOY, () => {
+      this.gameData.totalCoins -= furnaceUpgradeCost;
+      this.gameData.furnaceLevel += 1;
+    }, !canUpgradeFurnace);
+
+    this.renderer.drawText('Increase heating speed', ox + 135, oy + 52 + upgradeablesOY, { size: 0.5});
+    this.renderer.drawText('of the furnace.', ox + 135, oy + 57 + upgradeablesOY, { size: 0.5});
 
     // Grind wheel
     const grindWheelUpgradeCost = getUpgradeCost(15, grindWheelLevel + 1);
     const canUpgradeGrindWheel = coins >= grindWheelUpgradeCost;
 
-    this.renderer.drawSprite(13, 0, 7, 8, ox + 0, oy + 75 + upgradeablesOY, 7, 8, {});
+    this.renderer.drawSprite(13, 0, 7, 8, ox + 3, oy + 75 + upgradeablesOY, 7, 8, {});
     this.drawButton(`Buy level ${grindWheelLevel + 1} (${grindWheelUpgradeCost}c)`, ox + 20, oy + 72 + upgradeablesOY, () => {
       this.gameData.totalCoins -= grindWheelUpgradeCost;
       this.gameData.grindWheelLevel += 1;
@@ -339,7 +353,7 @@ export class UI {
     const coalUpgradeCost = getUpgradeCost(10, coalLevel + 1);
     const canUpgradeCoal = coins >= coalUpgradeCost;
 
-    this.renderer.drawSprite(18, 8, 6, 5, ox + 0, oy + 100 + upgradeablesOY, 6, 5, {});
+    this.renderer.drawSprite(18, 8, 6, 5, ox + 4, oy + 100 + upgradeablesOY, 6, 5, {});
     this.drawButton(`Buy level ${coalLevel + 1} (${coalUpgradeCost}c)`, ox + 20, oy + 95 + upgradeablesOY, () => {
       this.gameData.totalCoins -= coalUpgradeCost;
       this.gameData.coalLevel += 1;
@@ -351,17 +365,17 @@ export class UI {
     // Couch
     const canBuyCouch = coins >= 200 && !couch;
 
-    this.renderer.drawSprite(0, 0, 30, 12, ox + 0, oy + 119 + upgradeablesOY, 30, 12, {});
+    this.renderer.drawSprite(68, 10, 22, 11, ox + 0, oy + 119 + upgradeablesOY, 22, 11, {});
 
-    this.drawButton(`Buy for 200c`, ox + 40, oy + 118 + upgradeablesOY, () => {
+    this.drawButton(this.gameData.bench ? `Already bought` : `Buy for 200c`, ox + 40, oy + 118 + upgradeablesOY, () => {
       this.gameData.totalCoins -= 200;
-      this.gameData.couch = 1; 
+      this.gameData.bench = 1; 
     }, !canBuyCouch);
 
     this.renderer.drawText('Make your customers', ox + 135, oy + 122 + upgradeablesOY, { size: 0.5});
     this.renderer.drawText('feel more comfy.', ox + 135, oy + 127 + upgradeablesOY, { size: 0.5});
 
-    this.drawButton(`Start next day`, ox + 50, oy + 148 + upgradeablesOY, () => {
+    this.drawButton(`Start next day`, ox + 50, oy + 144 + upgradeablesOY, () => {
       this.gameData.startNextDay();
     });
   }

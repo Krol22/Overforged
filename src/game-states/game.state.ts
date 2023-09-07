@@ -41,6 +41,9 @@ import { FunnelNotifySystem } from '@/systems/funnelNotify.system';
 import { DropzoneActionTextSystem } from '@/systems/dropzoneActionText.system';
 import { MovementAnimationSystem } from '@/systems/movementAnimation.system';
 import { ScreenTransition } from '@/core/screen-transition';
+import { CustomerWaitSystem } from '@/systems/customerWait.system';
+import { gameStateMachine } from '@/game-state-machine';
+import { gameOverState } from './gameOver.state';
 
 function spawnDesk(): Entity {
   const deskEntity = new Entity();
@@ -203,7 +206,7 @@ function spawnCustomerSpawner(): Entity {
   const customerSpawner = new Entity();
 
   customerSpawner.addComponents([
-    new CustomerSpawnerComponent(60),
+    new CustomerSpawnerComponent(10),
   ]);
 
   return customerSpawner;
@@ -291,6 +294,7 @@ class GameState implements State {
 
     const dropzoneActionTextSystem = new DropzoneActionTextSystem(playerEntity, this.ui);
     const movementAnimationSystem = new MovementAnimationSystem();
+    const customerWaitSystem = new CustomerWaitSystem();
 
     this.ecs.addSystems([
       controlsSystem,
@@ -315,6 +319,7 @@ class GameState implements State {
       healthBarSystem,
       customerTooltipSystem,
       customerQueueSystem,
+      customerWaitSystem,
       funnelNotifySystem,
 
       dropzoneActionTextSystem,
@@ -322,11 +327,12 @@ class GameState implements State {
     ]);
 
     this.gameData.isPaused = true;
+    this.ecs.start(); 
+    this.ecs.update(1); 
+    
     this.screenTransition.startTransition(() => {
       this.gameData.isPaused = false;
     }, 50, true);
-
-    this.ecs.start(); 
   }
 
   onUpdate(dt: number) {
@@ -340,10 +346,11 @@ class GameState implements State {
     this.renderer.drawOutsideWall(50);
     this.renderer.drawRightWall();
     this.renderer.drawFloor();
+    this.renderer.drawOrnaments(!!this.gameData.bench);
 
     this.ecs.update(dt);
+    this.ecs.draw();
 
-    this.renderer.drawOrnaments();
     this.renderer.drawSplitWall();
     this.renderer.drawEntry();
 
@@ -351,7 +358,13 @@ class GameState implements State {
       this.gameData.visibleCustomers === 0 &&
       this.gameData.customersToSpawn === 0
     ) {
-      this.gameData.finishDay();
+      this.gameData.lastCustomerNotification = true;
+    }
+
+    if (this.gameData.goToGameOverScreen) {
+      this.screenTransition.startTransition(() => {
+        gameStateMachine.setState(gameOverState);
+      }, 50);
     }
 
     this.ui.draw();
@@ -359,4 +372,4 @@ class GameState implements State {
   }
 }
 
-export const gameState = new GameState();
+export const gameStateFactory = () => new GameState();
