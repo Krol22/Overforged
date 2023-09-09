@@ -47,7 +47,7 @@ export class Renderer {
     this.fontImage.src = 'font.png';
 
     this.spriteImage = new Image();
-    this.spriteImage.src = 'sprite.png';
+    this.spriteImage.src = 'assets.png';
   }
 
   get canvasWidth() {

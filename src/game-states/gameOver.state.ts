@@ -57,7 +57,7 @@ class GameOverState implements State {
     this.ui.drawButton('Refine Your Skills', ox + 12, oy + 120, () => {});
     this.ui.drawButton('Another Round!', ox + 22, oy + 140, () => {
       this.screenTransition.startTransition(() => {
-        gameData.newGame();
+        gameData.newGame(false);
         gameStateMachine.setState(gameStateFactory());
       }, 50);
     });

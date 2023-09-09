@@ -9,7 +9,7 @@ import { controls } from './controls';
 import { GameData } from './gameData';
 import { LETTER_HEIGHT, LETTER_WIDTH, Renderer } from './renderer';
 
-enum CustomerSatisfaction {
+const enum CustomerSatisfaction {
   WELL_PLEASED = "most pleased",
   SATISFIED = "quite pleased",
   GOOD = "in good spirits",

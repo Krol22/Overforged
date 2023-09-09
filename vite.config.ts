@@ -118,7 +118,7 @@ function roadrollerPlugin(): Plugin {
           useShortDoctype: true,
           collapseWhitespace: true,
           collapseInlineTagWhitespace: true,
-          removeEmptyAttributes: true,
+          // removeEmptyAttributes: true,
           removeOptionalTags: true,
           sortAttributes: true,
           minifyCSS: true,

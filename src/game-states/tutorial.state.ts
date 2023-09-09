@@ -153,6 +153,29 @@ class TutorialState implements State {
   private rendererThirdPage() {
     this.renderer.drawText("How to play?", 135, 8, { size: 1.5, centered: true });
 
+    // Furnace
+    let oy = 25;
+
+    this.renderer.drawSprite(27, 15, 5, 6, 15, oy + 39, 5, 6);
+    this.renderer.drawSprite(0, 0, 13, 20, 12, oy + 28, 13, 20);
+    this.renderer.drawText("- ", 30, oy + 37, { size: 1 });
+    this.renderer.drawText("  Furnace, a hearth of the forge. Heats the steel.", 30, oy + 25, { size: 1 });
+    this.renderer.drawText("  Remember to keep the temperature high! Furnace", 30, oy + 33, { size: 1 });
+    this.renderer.drawText("  will inform you when item is heated when tooltip", 30, oy + 41, { size: 1 });
+    this.renderer.drawText("  above it will turn green!", 30, oy + 49, { size: 1 });
+
+    this.ui.drawButton('Next page', 230, 180, () => {
+      this.pageSelected = 1;
+    });
+
+    // Ironbox
+    oy = 85;
+
+    this.renderer.drawSprite(0, 20, 11, 8, 14, oy + 5, 11, 8);
+    this.renderer.drawText("- ", 30, oy + 7, { size: 1 });
+    this.renderer.drawText("  Box of infinite steel.", 30, oy + 7, { size: 1 });
+
+
     this.ui.drawButton('Start simple', 108, 125, () => {
       this.screenTransition.startTransition(() => {
         gameData.newGame(true);

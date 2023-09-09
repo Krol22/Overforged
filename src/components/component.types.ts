@@ -1,4 +1,4 @@
-export enum ComponentTypes {
+export const enum ComponentTypes {
   Anvil,
   Desk,
   Position,

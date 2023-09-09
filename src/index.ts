@@ -6,9 +6,9 @@ import { gameOverState } from './game-states/gameOver.state';
 import { tutorialState } from './game-states/tutorial.state';
 
 // createGameStateMachine(gameStateFactory());
-// createGameStateMachine(menuState);
+createGameStateMachine(menuState);
 // createGameStateMachine(gameOverState);
-createGameStateMachine(tutorialState());
+// createGameStateMachine(tutorialState());
 
 let previousTime = 0;
 const interval = 1000 / 60;

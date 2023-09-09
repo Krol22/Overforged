@@ -5,6 +5,7 @@ import { State } from '@/core/state';
 import { UI } from '@/core/ui';
 import { gameStateMachine } from '@/game-state-machine';
 import { gameStateFactory } from './game.state';
+import { tutorialState } from './tutorial.state';
 
 const subtext = [
   "* The forge waits for no one.",
@@ -77,10 +78,14 @@ class MenuState implements State {
       this.ui.drawButton('Continue', ox + 40, oy + 70, () => {});
     }
 
-    this.ui.drawButton('Learn the craft!', ox + 25, by + oy + 105, () => {});
+    this.ui.drawButton('Learn the craft!', ox + 25, by + oy + 105, () => {
+      this.screenTransition.startTransition(() => {
+        gameStateMachine.setState(tutorialState());
+      }, 50);
+    });
     this.ui.drawButton('Take me to the forge!', ox + 12, by + oy + 125, () => {
       this.screenTransition.startTransition(() => {
-        gameData.newGame();
+        gameData.newGame(false);
         gameStateMachine.setState(gameStateFactory());
       }, 50);
     });

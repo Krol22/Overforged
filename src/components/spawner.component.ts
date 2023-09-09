@@ -1,7 +1,7 @@
 import { Component } from '@/core/ecs';
 import { ComponentTypes } from './component.types';
 
-export enum Item {
+export const enum Item {
   coal = 'coal',
   steel = 'steel',
   hotSteel = 'hot-steel',
