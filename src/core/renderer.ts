@@ -1,5 +1,3 @@
-import font from '../assets/font.png';
-import sprite from '../assets/assets.png';
 import { characters } from './font';
 import { CellingY, FloorLevel } from '@/consts';
 import { controls } from './controls';
@@ -46,10 +44,10 @@ export class Renderer {
     controls.registerMouseEvents(canvas);
 
     this.fontImage = new Image();
-    this.fontImage.src = font;
+    this.fontImage.src = 'font.png';
 
     this.spriteImage = new Image();
-    this.spriteImage.src = sprite;
+    this.spriteImage.src = 'sprite.png';
   }
 
   get canvasWidth() {

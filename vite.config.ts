@@ -52,7 +52,7 @@ export default defineConfig(({ command, mode }) => {
       }
     };
     // @ts-ignore
-    config.plugins = [typescriptPlugin(), ectPlugin()]//, closurePlugin()];// , roadrollerPlugin(), ectPlugin()];
+    config.plugins = [typescriptPlugin(), closurePlugin(), ectPlugin()]//, closurePlugin()];// , roadrollerPlugin(), ectPlugin()];
   }
 
   return config;
