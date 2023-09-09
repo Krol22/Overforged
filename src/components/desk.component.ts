@@ -3,7 +3,7 @@ import { ComponentTypes } from './component.types';
 import { Item } from './spawner.component';
 
 export class DeskComponent extends Component {
-  public storedItems: Array<Item> = [Item.weapon, Item.axe, Item.horseShoe, Item.axe];
+  public storedItems: Array<Item> = [];
 
   constructor() {
     super(ComponentTypes.Desk);

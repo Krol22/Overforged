@@ -7,6 +7,7 @@ import { Item } from '@/components/spawner.component';
 import { SpriteComponent } from '@/components/sprite.component';
 import { FloorLevel } from '@/consts';
 import { Entity, System } from '@/core/ecs';
+import { gameData } from '@/core/gameData';
 
 const chances: Record<number, Item> = {
   50: Item.horseShoe,
@@ -15,17 +16,41 @@ const chances: Record<number, Item> = {
 };
 
 const sprites = [
-  () => new SpriteComponent(57, 23, 11, 17),
   () => new SpriteComponent(69, 25, 11, 15),
+  () => new SpriteComponent(57, 23, 11, 17),
   () => new SpriteComponent(81, 22, 16, 20),
 ];
 
+function* day0CustomerSprite(): Generator<SpriteComponent> {
+  yield sprites[0]();
+  yield sprites[1]();
+  yield sprites[2]();
+}
+
+const customerSpawner = day0CustomerSprite();
+
 const rollSprite = () => {
+  if (gameData.day === 0) {
+    return customerSpawner.next().value;
+  } 
+
   const index = Math.floor(Math.random() * 3);
   return sprites[index]();
 };
 
+function* day0Spawner(): Generator<Item.horseShoe | Item.axe | Item.weapon> {
+  yield Item.horseShoe;
+  yield Item.axe;
+  yield Item.weapon;
+}
+
+const spawner = day0Spawner();
+
 const rollItem = (): Item => {
+  if (gameData.day === 0) {
+    return spawner.next().value;
+  }
+
   const roll = Math.random() * 100;
 
   let currentSum = 0;

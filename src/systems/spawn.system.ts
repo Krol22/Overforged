@@ -17,7 +17,7 @@ function spawnCoal(): Entity {
 
   const spriteHeight = 5;
 
-  const positionComponent = new PositionComponent(Math.random() * 50, FloorLevel - spriteHeight);
+  const positionComponent = new PositionComponent(-100, FloorLevel - spriteHeight);
   const spriteComponent = new SpriteComponent(18, 8, 6, spriteHeight);
   const interactionComponent = new InteractionComponent(2, { x: 0, y: 0, w: 8, h: 4 });
   const pickableComponent = new PickableComponent(Item.coal, true);
@@ -40,7 +40,7 @@ function spawnSteel(): Entity {
   const steel = new Entity();
 
   const spriteHeight = 7;
-  const positionComponent = new PositionComponent(Math.random() * 50, FloorLevel - spriteHeight);
+  const positionComponent = new PositionComponent(-100, FloorLevel - spriteHeight);
   const spriteComponent = new SpriteComponent(25, 8, 7, spriteHeight);
   const interactionComponent = new InteractionComponent(2, { x: 0, y: 0, w: 2, h: 8 });
   const pickableComponent = new PickableComponent(Item.steel);

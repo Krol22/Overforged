@@ -33,7 +33,6 @@ export class SharpenerSystem extends System {
 
   public update(_dt: number): void {
     const playerPlayerComponent = this.playerEntity.getComponent<PlayerComponent>(ComponentTypes.Player);
-    const playerSpriteComponent = this.playerEntity.getComponent<SpriteComponent>(ComponentTypes.Sprite);
 
     this.systemEntities.forEach((entity) => {
       const positionComponent = entity.getComponent<PositionComponent>(ComponentTypes.Position);
@@ -41,9 +40,6 @@ export class SharpenerSystem extends System {
       const sharpenerComponent = entity.getComponent<SharpenerComponent>(ComponentTypes.Sharpener);
       const transformerComponent = entity.getComponent<TransformerComponent>(ComponentTypes.Transformer);
       const interactionComponent = entity.getComponent<InteractionComponent>(ComponentTypes.Interaction);
-
-      // playerSpriteComponent.sx = 32;
-      // playerSpriteComponent.sy = 26;
 
       if (!playerPlayerComponent.pickedItem) {
         return;
@@ -57,6 +53,7 @@ export class SharpenerSystem extends System {
       }
 
       if (!interactionComponent.isOverlaping) {
+        playerPlayerComponent.hasMoveLocked = false;
         return;
       }
 
@@ -66,8 +63,6 @@ export class SharpenerSystem extends System {
 
       if (controls.isConfirm) {
         playerPlayerComponent.hasMoveLocked = true;
-        // playerSpriteComponent.sx = 48;
-        // playerSpriteComponent.sy = 26;
 
         const hasSharpenItem = this.sharpenItem(positionComponent, sharpenerComponent);
         if (!hasSharpenItem) {

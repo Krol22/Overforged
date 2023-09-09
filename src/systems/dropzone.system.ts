@@ -46,9 +46,6 @@ export class DropzoneSystem extends System {
       if (controls.isConfirm && !controls.previousState.isConfirm) {
         if (itemHolderComponent.hasItemOn) {
             // switch items  
-          console.log(funnelComponent);
-          console.log(itemHolderComponent);
-          console.log(canUseEntity);
           const holdingItem = this.getEntity(itemHolderComponent.holdingItemId);
 
           if (playerPlayerComponent.pickedItem) {

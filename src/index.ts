@@ -3,10 +3,12 @@ import { controls } from '@/core/controls';
 import { gameStateFactory } from './game-states/game.state';
 import { menuState } from './game-states/menu.state';
 import { gameOverState } from './game-states/gameOver.state';
+import { tutorialState } from './game-states/tutorial.state';
 
 // createGameStateMachine(gameStateFactory());
 // createGameStateMachine(menuState);
-createGameStateMachine(gameOverState);
+// createGameStateMachine(gameOverState);
+createGameStateMachine(tutorialState());
 
 let previousTime = 0;
 const interval = 1000 / 60;

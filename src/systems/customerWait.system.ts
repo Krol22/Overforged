@@ -17,6 +17,14 @@ export class CustomerWaitSystem extends System {
       const customerComponent = entity.getComponent<CustomerComponent>(ComponentTypes.Customer);
       const physicsComponent = entity.getComponent<PhysicsComponent>(ComponentTypes.Physics);
 
+      if (customerComponent.isLeaving) {
+        physicsComponent.vx = -0.8;
+      }
+
+      if (this.gameData.day === 0) {
+        return;
+      }
+
       if (physicsComponent.vx === 0) {
         customerComponent.waits += 0.1;
       }
@@ -31,10 +39,6 @@ export class CustomerWaitSystem extends System {
 
       if (customerComponent.waits >= CustomerWaitTime) {
         customerComponent.isLeaving = true;
-      }
-
-      if (customerComponent.isLeaving) {
-        physicsComponent.vx = -0.8;
       }
 
       if (customerComponent.bought) {

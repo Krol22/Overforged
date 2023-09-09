@@ -7,9 +7,9 @@ import { PositionComponent } from '@/components/position.component';
 import { SpriteComponent } from '@/components/sprite.component';
 import { MaxHeatLevel, SteelComponent } from '@/components/steel.component';
 import { System } from '@/core/ecs';
+import { gameData } from '@/core/gameData';
 import { Renderer } from '@/core/renderer';
 import { drawTooltipBox } from '@/utils/drawTooltipBox';
-import { setSpriteCoords } from '@/utils/setSpriteCoords';
 
 const MaxTemperature = 100;
 

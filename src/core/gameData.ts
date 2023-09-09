@@ -74,7 +74,17 @@ export class GameData {
   public sharpening = 1;
   public furnaceEfficency = 1;
 
-  public newGame() {
+  public newGame(tutorialFirst: boolean) {
+    if (tutorialFirst) {
+      this.day = 0;
+      this.customersToSpawn = 3;
+      this.maxClientSpawned = 1;
+    } else {
+      this.day = 1;
+      this.customersToSpawn = 5;
+      this.maxClientSpawned = 2;
+    }
+
     this.furnaceLevel = 1;
     this.grindWheelLevel = 1;
     this.coalLevel = 1;
@@ -82,13 +92,12 @@ export class GameData {
 
     this.totalCoins = 0;
     this.totalSatisfaction = 0;
-    this.customersToSpawn = 1;
-    this.maxClientSpawned = 2;
     this.clientsHandled = 0;
 
     this.isDayChangeOverlayVisible = false;
     this.lastCustomerNotification = false;
     this.goToGameOverScreen = false;
+    this.isPaused = false;
   }
 
   public showSettings() {

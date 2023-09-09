@@ -290,6 +290,26 @@ export class UI {
   }
 
   drawBetweenDaysOverlay() {
+    if (this.gameData.day === 0) {
+      const ox = 60;
+      const oy = 20;
+
+      const modalW = 200;
+      const modalH = 181;
+
+      this.renderer.drawRect(ox - 7, oy - 12, modalW + 4, modalH + 4, { color: '#3c2013', fill: true });
+      this.renderer.drawRect(ox - 9, oy - 10, modalW + 8, modalH, { color: '#3c2013', fill: true });
+      this.renderer.drawRect(ox - 5, oy - 10, modalW, modalH, { color: '#222', fill: true });
+      this.renderer.drawRect(ox - 7, oy - 8, modalW + 4, modalH - 4, { color: '#222', fill: true });
+
+      this.renderer.drawText(`Congratulations!`, ox + 32, oy - 0, { size: 1.5 });
+
+      this.drawButton(`Start next day`, ox + 50, oy + 144, () => {
+        this.gameData.newGame(false);
+      });
+      return;
+    }
+
     const ox = 60;
     const oy = 20;
 
@@ -300,6 +320,7 @@ export class UI {
     this.renderer.drawRect(ox - 9, oy - 10, modalW + 8, modalH, { color: '#3c2013', fill: true });
     this.renderer.drawRect(ox - 5, oy - 10, modalW, modalH, { color: '#222', fill: true });
     this.renderer.drawRect(ox - 7, oy - 8, modalW + 4, modalH - 4, { color: '#222', fill: true });
+
 
     this.renderer.drawText(`Day ${this.gameData.day} summary: `, ox + 42, oy - 0, { size: 1.5 });
 

@@ -8,6 +8,13 @@ import { controls } from '@/core/controls';
 import { System } from '@/core/ecs';
 import { UI } from '@/core/ui';
 
+function* clearDeskAfter0Day() {
+  const deskComponent: DeskComponent = yield;
+  deskComponent.storedItems = [];
+}
+
+const cleaner = clearDeskAfter0Day();
+
 export class DeskSystem extends System {
   constructor(
     private ui: UI,
@@ -31,6 +38,10 @@ export class DeskSystem extends System {
     const deskComponent = deskEntity.getComponent<DeskComponent>(ComponentTypes.Desk);
     const interactionComponent = deskEntity.getComponent<InteractionComponent>(ComponentTypes.Interaction);
     const funnelComponent = deskEntity.getComponent<FunnelComponent>(ComponentTypes.Funnel);
+
+    if (this.gameData.day !== 0) {
+      cleaner.next(deskComponent);
+    }
 
     const storedItems: Partial<Record<Item, number>> = {};
 
