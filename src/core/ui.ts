@@ -360,7 +360,7 @@ export class UI {
     const coins = this.gameData.totalCoins;
 
     // Furnace
-    const furnaceUpgradeCost = getUpgradeCost(20, furnaceLevel);
+    const furnaceUpgradeCost = getUpgradeCost(15, furnaceLevel);
     const canUpgradeFurnace = coins >= furnaceUpgradeCost;
 
     // Furnace
