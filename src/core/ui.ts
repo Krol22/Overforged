@@ -1,7 +1,7 @@
 import { PositionComponent } from '@/components/position.component';
 import { Item } from '@/components/spawner.component';
 import { SpriteComponent } from '@/components/sprite.component';
-import { CellingY, FloorLevel } from '@/consts';
+import { CellingY, FloorLevel, MaxSatisfaction } from '@/consts';
 import { drawTooltipBox } from '@/utils/drawTooltipBox';
 import { getUpgradeCost } from '@/utils/getUpgradeCost';
 import { setSpriteCoords } from '@/utils/setSpriteCoords';
@@ -117,9 +117,6 @@ export class UI {
     }
 
     this.drawGameUI();
-    // this.drawButton('Settings', this.renderer.canvasWidth / 2 - 57, 23, () => {
-      // this.gameData.showSettings();
-    // });
 
     if (this.gameData.isDayChangeOverlayVisible) {
       this.drawBetweenDaysOverlay();
@@ -161,7 +158,7 @@ export class UI {
   }
 
   drawGameUI() {
-    // this.drawDayCycleUI();
+    this.drawUI();
     this.drawStoredItems();
     if (this.gameData.lastCustomerNotification) {
       if (this.notificationOpacityDir === 0) {
@@ -199,7 +196,7 @@ export class UI {
     this.renderer.drawRect(ox + 0, oy + 0, 101, 24, { color: `#000${hexOpacity}`, fill: true });
 
     this.renderer.drawText('And that was all', ox + 4, oy + 4, { size: 1, opacity: counter});  
-    this.renderer.drawText('customers this day.', ox + 4, oy + 14, { size: 1, opacity: counter });  
+    this.renderer.drawText('villagers this day.', ox + 4, oy + 14, { size: 1, opacity: counter });  
   }
 
   getTooltipColor(item: Item) {
@@ -208,7 +205,11 @@ export class UI {
       const requiredItemsNumber = this.requiredItems.filter((i) => item === i).length;
 
       if (numberOfItem < requiredItemsNumber) {
-        return '#ac3232';
+        if (numberOfItem === 0) {
+          return '#ac3232';
+        }
+
+        return '#df7126';
       }
 
       return '#97f3a7';
@@ -233,6 +234,16 @@ export class UI {
     });
 
     this.drawButton(`Exit to menu`, ox + 76, oy + 30, () => {});
+  }
+
+  drawUI() {
+    const ox = 40;
+    const oy = CellingY - 21;
+
+    const emote = mapValueToScale(MaxSatisfaction - this.gameData.totalSatisfaction);
+
+    this.renderer.drawText(`Lord mood: `, ox + 10, oy + 8, {});
+    this.renderer.drawSprite(24 + 10 * emote, 41, 10, 10, ox + 61, oy + 5, 10, 10, {});
   }
 
   drawStoredItems() {
@@ -292,19 +303,25 @@ export class UI {
   drawBetweenDaysOverlay() {
     if (this.gameData.day === 0) {
       const ox = 60;
-      const oy = 20;
+      const oy = 50;
 
       const modalW = 200;
-      const modalH = 181;
+      const modalH = 111;
 
       this.renderer.drawRect(ox - 7, oy - 12, modalW + 4, modalH + 4, { color: '#3c2013', fill: true });
       this.renderer.drawRect(ox - 9, oy - 10, modalW + 8, modalH, { color: '#3c2013', fill: true });
       this.renderer.drawRect(ox - 5, oy - 10, modalW, modalH, { color: '#222', fill: true });
       this.renderer.drawRect(ox - 7, oy - 8, modalW + 4, modalH - 4, { color: '#222', fill: true });
 
-      this.renderer.drawText(`Congratulations!`, ox + 32, oy - 0, { size: 1.5 });
+      this.renderer.drawText(`Congratulations, Smith!`, ox + 12, oy - 0, { size: 1.5 });
 
-      this.drawButton(`Start next day`, ox + 50, oy + 144, () => {
+      this.renderer.drawText("You have completed your day of training.", ox + 97, oy + 25, { size: 1, centered: true });
+      this.renderer.drawText("The lessons are over, and now the", ox + 97, oy + 34, { size: 1, centered: true });
+      this.renderer.drawText("true test begins. Prepare yourself.", ox + 97, oy + 43, { size: 1, centered: true });
+      this.renderer.drawText("The villagers and the Lord await your", ox + 97, oy + 52, { size: 1, centered: true });
+      this.renderer.drawText("craftsmanship.", ox + 97, oy + 61, { size: 1, centered: true });
+
+      this.drawButton(`Take me to forge already!`, ox + 25, oy + 79, () => {
         this.gameData.newGame(false);
       });
       return;
@@ -423,4 +440,14 @@ function mapToHex(value: number) {
   
   // Convert to hex
   return intVal.toString(16).toUpperCase();
+}
+
+function mapValueToScale(value) {
+  if (value <= 3.3) {
+    return 0;
+  } else if (value <= 6.6) {
+    return 1;
+  } else {
+    return 2;
+  }
 }

@@ -4,7 +4,7 @@ import { DeskComponent } from '@/components/desk.component';
 import { PhysicsComponent } from '@/components/physics.component';
 import { PositionComponent } from '@/components/position.component';
 import { SpriteComponent } from '@/components/sprite.component';
-import { CustomerBetweenMargin, CustomerWaitTime } from '@/consts';
+import { CustomerBetweenMargin } from '@/consts';
 import { System } from '@/core/ecs';
 
 export class CustomerQueueSystem extends System {

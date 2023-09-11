@@ -15,7 +15,7 @@ export class GameData {
     return this._isPaused;
   }
 
-  public day: number = 1;
+  public day: number = 0;
   public currentTime: number = 0;
 
   public _grindWheelLevel: number = 1;
@@ -58,9 +58,18 @@ export class GameData {
   public maxClientSpawned: number = 2;
   public visibleCustomers: number = 0;
 
-  public dailyCustomerSatisfaction: number = 0;
+  public _totalSatisfaction: number = 0;
+  public set totalSatisfaction(value: number) {
+    this._totalSatisfaction = value;
+    if (this._totalSatisfaction >= 10) {
+      this._totalSatisfaction = 10;
+    }
+  }
+
   public clientsHandled: number = 0;
-  public totalSatisfaction: number = 0;
+  public get totalSatisfaction() {
+    return this._totalSatisfaction;
+  };
 
   // Control variables
   public isDayChangeOverlayVisible: boolean = false;
@@ -91,7 +100,7 @@ export class GameData {
     this.bench = 0;
 
     this.totalCoins = 0;
-    this.totalSatisfaction = 0;
+    this.totalSatisfaction = 10;
     this.clientsHandled = 0;
 
     this.isDayChangeOverlayVisible = false;
@@ -111,8 +120,6 @@ export class GameData {
   }
 
   public finishDay() {
-    this.totalSatisfaction += this.dailyCustomerSatisfaction;
-    this.dailyCustomerSatisfaction = 0;
     this.isPaused = true;
     
     if (this.totalSatisfaction >= MaxSatisfaction) {
@@ -132,10 +139,9 @@ export class GameData {
 
     this.day = this.day + 1;
     this.customersToSpawn = 5 + getUpgradeCost(2, this.day);
-    this.maxClientSpawned += 1;
+    this.maxClientSpawned += 0.5;
 
     this.isDayChangeOverlayVisible = false;
-    this.dailyCustomerSatisfaction = 0;
 
     this.currentTime = 0;
     this.alreadySpawnedCustomers = 0;

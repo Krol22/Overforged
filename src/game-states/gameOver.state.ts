@@ -5,6 +5,7 @@ import { State } from '@/core/state';
 import { UI } from '@/core/ui';
 import { gameStateMachine } from '@/game-state-machine';
 import { gameStateFactory } from './game.state';
+import { tutorialState } from './tutorial.state';
 
 const subtext = [
   "Even the finest smiths endure setbacks.",
@@ -54,7 +55,12 @@ class GameOverState implements State {
     this.renderer.drawText(`You managed to keep the forge burning for ${gameData.day} days,`, ox - 52, oy + 90, { size: 1 });
     this.renderer.drawText(`crafting wares for a total of ${gameData.clientsHandled} villagers.`, ox - 39, oy + 100, { size: 1 });
 
-    this.ui.drawButton('Refine Your Skills', ox + 12, oy + 120, () => {});
+    this.ui.drawButton('Refine Your Skills', ox + 12, oy + 120, () => {
+      this.screenTransition.startTransition(() => {
+        gameStateMachine.setState(tutorialState());
+      }, 50);
+    });
+
     this.ui.drawButton('Another Round!', ox + 22, oy + 140, () => {
       this.screenTransition.startTransition(() => {
         gameData.newGame(false);

@@ -206,7 +206,7 @@ function spawnCustomerSpawner(): Entity {
   const customerSpawner = new Entity();
 
   customerSpawner.addComponents([
-    new CustomerSpawnerComponent(10),
+    new CustomerSpawnerComponent(15),
   ]);
 
   return customerSpawner;

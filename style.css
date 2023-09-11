@@ -20,20 +20,5 @@ html, body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) scale(2);
-    border-left: 8px solid var(--border-color);
-    border-right: 8px solid var(--border-color);
-    padding: 16px 20px;
-}
-
-.game:before {
-    position: absolute;
-    content: '';
-    display: block;
-    top: -8px;
-    bottom: -8px;
-    left: 0;
-    right: 0;
-    border-top: 8px solid var(--border-color);
-    border-bottom: 8px solid var(--border-color);
+    transform: translate(-50%, -50%);
 }

@@ -2,20 +2,19 @@ import { Component } from '@/core/ecs';
 import { ComponentTypes } from './component.types';
 
 export const enum Item {
-  coal = 'coal',
-  steel = 'steel',
-  hotSteel = 'hot-steel',
+  coal = 'Coal',
+  steel = 'Steel',
+  hotSteel = 'Hot Steel',
 
-  horseShoe = 'horse-shoe',
+  horseShoe = 'Horse Shoe',
 
-  weapon1 = 'weapon1', // from hot-steel to anvil
-  weapon2 = 'weapon2', // from anvil to furnace,
-  weapon3 = 'weapon3', // from furnace to anvil
-  weapon = 'weapon', // from anvil to sharpener
+  weapon1 = 'Forged Blade', // from hot-steel to anvil
+  weapon2 = 'Heated Blade', // from anvil to furnace,
+  weapon3 = 'Sword', // from furnace to anvil
+  weapon = 'Sharpened Sword', // from anvil to sharpener
 
-  axe1 = 'axe1', // from hot-sceel to anvil
-  axe2 = 'axe2', // from anvil to anvil
-  axe = 'axe', // from anvil to sharpener
+  axe1 = 'Axe', // from hot-sceel to anvil
+  axe = 'Sharpened Axe', // from anvil to sharpener
 }
 
 export class SpawnerComponent extends Component {

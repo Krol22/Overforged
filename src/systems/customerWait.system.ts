@@ -3,6 +3,7 @@ import { CustomerComponent } from '@/components/customer.component';
 import { PhysicsComponent } from '@/components/physics.component';
 import { CustomerWaitTime } from '@/consts';
 import { System } from '@/core/ecs';
+import { gameData } from '@/core/gameData';
 
 export class CustomerWaitSystem extends System {
   constructor() {
@@ -26,11 +27,18 @@ export class CustomerWaitSystem extends System {
       }
 
       if (physicsComponent.vx === 0) {
-        customerComponent.waits += 0.1;
+        let waitBase = 1;
+        let waitTime = 0.1 * (waitBase + gameData.day / 8);
+        if (this.gameData.bench) {
+          waitBase = 1;
+          waitTime = 0.07 * (waitBase + gameData.day / 8);
+        }
+
+        customerComponent.waits += waitTime;
       }
 
       if (physicsComponent.vx > 0) {
-        customerComponent.waits -= 0;
+        customerComponent.waits -= 0.1;
 
         if (customerComponent.waits <= 0) {
           customerComponent.waits = 0;

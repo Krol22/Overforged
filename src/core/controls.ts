@@ -36,11 +36,26 @@ class Controls {
   registerMouseEvents(canvas: HTMLCanvasElement) {
     canvas.addEventListener('mousemove', (event) => {
       const rect = canvas.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
+      const gameContainer = canvas.parentElement;
 
-      this.mouseX = x / 4;
-      this.mouseY = y / 4;
+      if (!gameContainer) {
+        return;
+      }
+      
+      const style = window.getComputedStyle(gameContainer);
+      const transform = style.transform || 'none';
+      let scaleFactor = 1;
+
+      if (transform !== 'none') {
+        const values = transform.split('(')[1].split(')')[0].split(',');
+        scaleFactor = parseFloat(values[0]); // Assuming uniform scaling
+      }
+
+      const x = (event.clientX - rect.left) / scaleFactor / 2;
+      const y = (event.clientY - rect.top) / scaleFactor / 2;
+
+      this.mouseX = x;
+      this.mouseY = y;
     });
 
     canvas.addEventListener('mousedown', (event) => {

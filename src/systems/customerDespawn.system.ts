@@ -6,9 +6,9 @@ import { AngryCustomerFactor, HappyCustomerFactor } from '@/consts';
 import { System } from '@/core/ecs';
 
 const coinValue = {
-  [Item.horseShoe]: 1,
-  [Item.axe]: 2,
-  [Item.weapon]: 4,
+  [Item.horseShoe]: 2,
+  [Item.axe]: 3,
+  [Item.weapon]: 5,
 };
 
 const satisfactionFactor = {
@@ -30,10 +30,10 @@ export class CustomerDespawnSystem extends System {
       if (positionComponent.x <= -20 && customerComponent.isLeaving) {
         const item = customerComponent.wantsToBuy[0] as Item.horseShoe | Item.axe | Item.weapon;
         if (customerComponent.bought) {
-          this.gameData.dailyCustomerSatisfaction += HappyCustomerFactor * satisfactionFactor[item];
+          this.gameData.totalSatisfaction += HappyCustomerFactor * satisfactionFactor[item];
           this.gameData.totalCoins += coinValue[item];
         } else {
-          this.gameData.dailyCustomerSatisfaction += AngryCustomerFactor;
+          this.gameData.totalSatisfaction += AngryCustomerFactor;
         }
 
         this.markToRemove(entity.id);
